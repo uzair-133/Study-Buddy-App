@@ -7,7 +7,8 @@ const App = () => {
   return (
     <>
   
-      <BrowserRouter>
+      <div className='bg-paper min-h-screen m-2 pt-6  md:pt-8 md:m-2'>
+        <BrowserRouter>
         <Navbar />
         <Routes>
           <Route path='/' element={<Home />} />
@@ -15,6 +16,7 @@ const App = () => {
           <Route path='/signup' element={<SignUp />} />
         </Routes>
       </BrowserRouter>
+      </div>
 
 
     </>
