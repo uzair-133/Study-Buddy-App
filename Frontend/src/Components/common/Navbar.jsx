@@ -27,7 +27,7 @@ const Navbar = () => {
         <div>
           <Link  className='text-1xl sm:text-2xl font-display text-ink' to='/'>Study Buddy</Link>
         </div>
-        <nav className='hidden md:flex items-center md:text-sm md:space-x-3'>
+        <nav className='hidden md:flex items-center md:text-sm md:space-x-3 lg:space-x-5 lg:text-[17px]'>
           <a className=' font-sans text-ink-soft hover:text-violet' href='#'>Features</a>
           <a className=' font-sans text-ink-soft hover:text-violet' href='#'>About</a>
           <a className=' font-sans text-ink-soft hover:text-violet' href='#'>How it Works</a>
