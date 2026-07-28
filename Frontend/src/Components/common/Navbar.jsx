@@ -23,7 +23,7 @@ const Navbar = () => {
   }
   return (
     <>
-      <div className='w-[90%] sm:max-w-[600px] md:max-w-[780px] lg:max-w-[1120px]   rounded-3xl mx-auto h-16  px-8 md:py-10 mt-8  relative bg-paper-raised flex items-center justify-between border-[0.5px] border-gray-300 '>
+      <div className='w-[90%] sm:max-w-150 md:max-w-195 lg:max-w-280   rounded-3xl mx-auto h-16  px-8 md:py-10 mt-8  relative bg-paper-raised flex items-center justify-between border-[0.5px] border-gray-300 '>
         <div>
           <Link  className='text-1xl sm:text-2xl font-display text-ink' to='/'>Study Buddy</Link>
         </div>
@@ -43,14 +43,14 @@ const Navbar = () => {
         </button>
 
         <div id='btn' className=' absolute hidden transition-all  duration-300 ease-in-out
-              sm:max-w-[600px] h-55 mx-auto top-12 bottom-0 right-0 left-0 p-5 md:hidden  bg-paper-raised border border-line shadow-lg shadow-violet/10 p-5   '>
+              sm:max-w-150 h-55 mx-auto top-12 bottom-0 right-0 left-0 p-5 md:hidden  bg-paper-raised border border-line shadow-lg shadow-violet/10   '>
           <nav className='md:hidden flex flex-col space-y-3'>
 
             <a onClick={ToggleMenuButtonClose} href='#'>Features</a>
             <a onClick={ToggleMenuButtonClose} href='#'>About</a>
             <a onClick={ToggleMenuButtonClose} href='#'>How it Works</a>
           </nav>
-          <div className='md:hidden block flex flex-col space-y-3'>
+          <div className='md:hidden  flex flex-col space-y-3'>
             <Link onClick={ToggleMenuButtonClose} className='text-ink font-sans hover:text-violet' to='/login'><button>Log in</button></Link>
             <Link onClick={ToggleMenuButtonClose} className=' font-sans bg-violet px-4 py-3 rounded-full text-white w-fit' to='/signup'><button>Sign Up Free</button></Link>
           </div>

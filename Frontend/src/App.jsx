@@ -7,7 +7,7 @@ const App = () => {
   return (
     <>
   
-      <div className='bg-paper min-h-screen m-2 pt-6  md:pt-8 md:m-2'>
+      <div className='bg-paper min-h-screen m-2 pt-6   md:pt-8 md:m-2'>
         <BrowserRouter>
         <Navbar />
         <Routes>
