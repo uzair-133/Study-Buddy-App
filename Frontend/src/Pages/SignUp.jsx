@@ -3,8 +3,12 @@ import React from 'react'
 const SignUp = () => {
   return (
    <>
-   
-   <h1>Sign Up</h1>
+   <main>
+    <section>
+      <h1>Study Buddy</h1>
+      
+    </section>
+   </main>
    </>
   )
 }
