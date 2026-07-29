@@ -2,6 +2,8 @@ import Hero from "../Components/Hero"
 import ProblemStatement from "../Components/ProblemStatement"
 import Feature from "../Components/Feature"
 import Work from "../Components/Work"
+import Footer from "../Components/common/Footer"
+import Cta from "../Components/Cta"
 const Home = () => {
   return (
    <>
@@ -10,6 +12,8 @@ const Home = () => {
   <ProblemStatement/>
   <Feature/>
   <Work/>
+  <Cta/>
+  <Footer/>
    </>
   )
 }

@@ -25,10 +25,10 @@ const Navbar = () => {
     <>
       <div className='w-[90%] sm:max-w-150 md:max-w-195 lg:max-w-280   rounded-3xl mx-auto h-16  px-8 md:py-10 mt-8  relative bg-paper-raised flex items-center justify-between border-[0.5px] border-gray-300 '>
         <div>
-          <Link  className='text-1xl sm:text-2xl font-display text-ink' to='/'>Study Buddy</Link>
+          <Link data-aos="fade-down" className='text-1xl sm:text-2xl font-display text-ink' to='/'>Study Buddy</Link>
         </div>
-        <nav className='hidden md:flex items-center md:text-sm md:space-x-3 lg:space-x-5 lg:text-[17px]'>
-          <a className=' font-sans text-ink-soft hover:text-violet' href='#'>Features</a>
+        <nav data-aos="fade-down" className='hidden md:flex items-center md:text-sm md:space-x-3 lg:space-x-5 lg:text-[17px]'>
+          <a  className=' font-sans text-ink-soft hover:text-violet' href='#'>Features</a>
           <a className=' font-sans text-ink-soft hover:text-violet' href='#'>About</a>
           <a className=' font-sans text-ink-soft hover:text-violet' href='#'>How it Works</a>
         </nav>

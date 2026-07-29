@@ -32,7 +32,7 @@ const Feature = () => {
             para: "Keep the questions that actually show up on papers, attached to the right chapter."
         }
 
-    ]
+]   
     return (
         <>
             <main className='w-[90%] mx-auto pt-10  sm:max-w-150 md:max-w-195 lg:max-w-280 '>

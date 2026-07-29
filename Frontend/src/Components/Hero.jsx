@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 const Hero = () => {
     return (
         <main className='w-[90%] sm:max-w-150 md:max-w-195 lg:max-w-280   pt-10 md:pt-16 md:flex mx-auto  '>
-            <div id='left' className='w-full   '>
+            <div  id='left' className='w-full   '>
                 <p className='text-violet py-1 px-2 rounded-full bg-line w-fit font-semibold'>Built for exam season</p>
                 <h1 className='pt-4 text-4xl font-semibold font-display leading-[1.2]  sm:text-4xl md:text-5xl'>Every note, slide
                     and scribble <em className='font-display text-coral'>in one place</em>.</h1>
@@ -13,7 +13,7 @@ const Hero = () => {
                     <button className='font-sans px-3 py-2 mt-4 ml-1 sm:px-4 sm:py-3 font-semibold rounded-full text-ink border-2  border-ink'> <a href="#">See how its works</a></button>
                 </div>
             </div>
-            <div id='right' className='w-full mt-6 '>
+            <div  id='right' className='w-full mt-6 '>
                 <div id='whitebox' className='w-[96%] h-full mx-auto bg-white rounded-2xl border-[0.5px] border-gray-300'>
                     <div id='p1' className='flex justify-between'>
                         <div>

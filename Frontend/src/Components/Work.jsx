@@ -28,7 +28,7 @@ const Work = () => {
     ]
   return (
     <>
-    <main className='w-[90%] mx-auto pt-10  sm:max-w-150 md:max-w-195 lg:max-w-280'>
+    <main  className='w-[90%] mx-auto pt-10  sm:max-w-150 md:max-w-195 lg:max-w-280'>
         <section className=''>
            <h1 className='text-2xl font-semibold font-sans md:text-3xl '>Three steps, then you're covered</h1>
         </section>

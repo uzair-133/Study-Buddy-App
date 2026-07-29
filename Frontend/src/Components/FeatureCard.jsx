@@ -1,8 +1,8 @@
-import React from 'react'
 
 const FeatureCard = ({icon:Icon, iconColor,bgColor, heading,para}) => {
   return (
     <>
+    
     <div className='bg-paper-raised border border-line rounded-2xl p-4'>
        <div className={`w-10 h-10 rounded-xl ${bgColor}  flex items-center justify-center mb-4`}>
         <Icon className={iconColor} size={20} />
