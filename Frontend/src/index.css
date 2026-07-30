@@ -31,3 +31,11 @@
         background-color: white;
     }
 }
+@layer components {
+  .input-field{
+    @apply focus:outline-none focus:ring-2 focus:ring-violet/40 focus:border-violet px-5 py-2 border border-gray-300 rounded-[10px] bg-paper
+  }
+  .btn-primary{
+    
+  }
+}

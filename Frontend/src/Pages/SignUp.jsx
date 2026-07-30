@@ -25,15 +25,15 @@ const SignUp = () => {
             </div>
 
             <label className='font-sans '>Full Name</label>
-            <input className='px-5 py-2 border border-gray-300 rounded-[10px] bg-paper' type="text" placeholder='Enter Name' />
+            <input className='input-field' type="text" placeholder='Enter Name' />
             <label>Email</label>
-            <input className='px-5 py-2 border border-gray-300 rounded-[10px] bg-paper' type="email" placeholder='Enter Name' />
+            <input className='input-field' type="email" placeholder='Enter Name' />
             <label>Password</label>
-            <input className='px-5 py-2 border border-gray-300 rounded-[10px] bg-paper' type="password" placeholder='Password' />
+            <input className='input-field' type="password" placeholder='Password' />
             <label >Confirm Password</label>
-            <input className='px-5 py-2 border border-gray-300 rounded-[10px] bg-paper' type="password" placeholder='Confirm Password' />
+            <input className='input-field' type="password" placeholder='Confirm Password' />
 
-            <input className=' font-sans bg-violet px-4 py-3 rounded-full text-white' type="submit" />
+            <input className=' font-sans  bg-violet px-4 py-3 rounded-full text-white' type="submit" />
             <div className='flex mx-auto mb-2'>
               <p>Alreday have an Account?</p>
               <Link className='text-violet' to='/login'>Login</Link>
@@ -42,7 +42,7 @@ const SignUp = () => {
           </form>
         </section>
       </main>
-     <Footer/>
+      <Footer />
     </>
   )
 }
