@@ -1,12 +1,72 @@
 import Footer from '../Components/common/Footer';
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 const SignUp = () => {
   const [role, setRole] = useState('student');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [form, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  })
 
+  const handleChange = ((e) => {
+    const { name, value } = e.target
 
-  const handleSubmit = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+
+  })
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    //Validation
+
+    if (!form.name || !form.email || !form.password || !form.confirmPassword) {
+      setError("All fields are required")
+      return
+    }
+
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.email)) {
+      setError("Please enter a valid email address")
+      return
+    }
+
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+    setLoading(true)
+    try {
+      const res = await axios.post("https://jsonplaceholder.typicode.com/users", {
+        ...form,
+        role
+      })
+      console.log(res.data)
+      alert("Account Created Successfully");
+      setFormData({name:"",email:"",password:"",confirmPassword:""})
+
+    }
+    catch (err) {
+      console.log("error", err)
+    }
+    finally {
+      setLoading(false)
+    }
+
   }
   return (
     <>
@@ -25,15 +85,15 @@ const SignUp = () => {
             </div>
 
             <label className='font-sans '>Full Name</label>
-            <input className='input-field' type="text" placeholder='Enter Name' />
+            <input onChange={handleChange} name='name' value={form.name} className='input-field' type="text" placeholder='Enter Name' />
             <label>Email</label>
-            <input className='input-field' type="email" placeholder='Enter Name' />
+            <input onChange={handleChange} name='email' value={form.email} className='input-field' type="email" placeholder='Enter Email' />
             <label>Password</label>
-            <input className='input-field' type="password" placeholder='Password' />
+            <input onChange={handleChange} name='password' value={form.password} className='input-field' type="password" placeholder='Password' />
             <label >Confirm Password</label>
-            <input className='input-field' type="password" placeholder='Confirm Password' />
-
-            <input className=' font-sans  bg-violet px-4 py-3 rounded-full text-white' type="submit" />
+            <input onChange={handleChange} name='confirmPassword' value={form.confirmPassword} className='input-field' type="password" placeholder='Confirm Password' />
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <button disabled={loading} className='font-sans  bg-violet px-4 py-3 rounded-full text-white'>{loading ? 'Submitting...':'Sign In'}</button>
             <div className='flex mx-auto mb-2'>
               <p>Alreday have an Account?</p>
               <Link className='text-violet' to='/login'>Login</Link>
