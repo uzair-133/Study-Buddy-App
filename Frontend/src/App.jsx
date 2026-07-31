@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './Pages/Home'
 import Login from './Pages/Login'
 import SignUp from './Pages/SignUp'
+import ScrollToHash from './Components/ScrollToHash'
 import { useEffect } from 'react'
 import 'aos/dist/aos.css';
 import AOS from 'aos';
@@ -18,6 +19,7 @@ const App = () => {
 
       <div className='bg-paper min-h-screen m-2 pt-6   md:pt-8 md:m-2'>
         <BrowserRouter>
+        <ScrollToHash/>
           <Navbar />
           <Routes>
             <Route path='/' element={<Home />} />
