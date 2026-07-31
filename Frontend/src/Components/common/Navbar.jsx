@@ -28,9 +28,9 @@ const Navbar = () => {
           <Link onClick={ToggleMenuButtonClose} data-aos="fade-down" className='text-1xl sm:text-2xl font-display text-ink' to='/'>Study Buddy</Link>
         </div>
         <nav data-aos="fade-down" className='hidden md:flex items-center md:text-sm md:space-x-3 lg:space-x-5 lg:text-[17px]'>
-        <Link to='/#features' className=' font-sans text-ink-soft hover:text-violet'>Features</Link>
-        <Link to='#' className=' font-sans text-ink-soft hover:text-violet'>About</Link>
-        <Link to='/#how' className=' font-sans text-ink-soft hover:text-violet'>How its Works</Link>
+          <Link to='/#features' className=' font-sans text-ink-soft hover:text-violet'>Features</Link>
+          <Link to='#' className=' font-sans text-ink-soft hover:text-violet'>About</Link>
+          <Link to='/#how' className=' font-sans text-ink-soft hover:text-violet'>How its Works</Link>
         </nav>
         <div className='md:block hidden'>
           <Link className='text-ink font-sans hover:text-violet' to='/login'><button>Log in</button></Link>
@@ -46,9 +46,9 @@ const Navbar = () => {
               sm:max-w-150 h-55 mx-auto top-12 bottom-0 right-0 left-0 p-5 md:hidden  bg-paper-raised border border-line shadow-lg shadow-violet/10   '>
           <nav className='md:hidden flex flex-col space-y-3'>
 
-            <a onClick={ToggleMenuButtonClose} href='#'>Features</a>
-            <a onClick={ToggleMenuButtonClose} href='#'>About</a>
-            <a onClick={ToggleMenuButtonClose} href='#'>How it Works</a>
+            <Link to='/#features' onClick={ToggleMenuButtonClose} >Features</Link>
+            <Link to='#' onClick={ToggleMenuButtonClose} >About</Link>
+            <Link to='/#how' onClick={ToggleMenuButtonClose} >How its Works</Link>
           </nav>
           <div className='md:hidden  flex flex-col space-y-3'>
             <Link onClick={ToggleMenuButtonClose} className='text-ink font-sans hover:text-violet' to='/login'><button>Log in</button></Link>
