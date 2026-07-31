@@ -3,6 +3,7 @@ import { use } from 'react';
 import { useState } from 'react'
 import axios from 'axios';
 import Footer from '../Components/common/Footer';
+import Forget from './Forget';
 import { Link } from 'react-router-dom';
 const Login = () => {
   const [form, setFormData] = useState({
@@ -13,10 +14,10 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const handleChange = (e) => {
-    const {name,value} = e.target;
-    setFormData((prev)=> ({
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]:value
+      [name]: value
     }))
   }
   const handleSubmit = async (e) => {
@@ -74,7 +75,10 @@ const Login = () => {
           <form onSubmit={handleSubmit} className='flex flex-col pt-3 space-y-3' >
             <label>Email</label>
             <input onChange={handleChange} name='email' value={form.email} className='input-field' type="email" placeholder='Enter Email' />
-            <label>Password</label>
+            <div className='flex justify-between'>
+              <label>Password</label>
+              <Link className='text-sm text-violet' to='/forget' >Forget Password ?</Link>
+            </div>
             <input onChange={handleChange} name='password' value={form.password} className='input-field' type="password" placeholder='Password' />
             <label >Confirm Password</label>
             <input onChange={handleChange} name='confirmPassword' value={form.confirmPassword} className='input-field' type="password" placeholder='Confirm Password' />
