@@ -2,10 +2,12 @@ import Footer from '../Components/common/Footer';
 import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 const SignUp = () => {
   const [role, setRole] = useState('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false)
+  const  navigate = useNavigate()
   const [form, setFormData] = useState({
     name: "",
     email: "",
@@ -57,7 +59,8 @@ const SignUp = () => {
       })
       console.log(res.data)
       alert("Account Created Successfully");
-      setFormData({name:"",email:"",password:"",confirmPassword:""})
+      setFormData({ name: "", email: "", password: "", confirmPassword: "" })
+      navigate('/login')
 
     }
     catch (err) {
@@ -93,7 +96,7 @@ const SignUp = () => {
             <label >Confirm Password</label>
             <input onChange={handleChange} name='confirmPassword' value={form.confirmPassword} className='input-field' type="password" placeholder='Confirm Password' />
             {error && <p style={{ color: "red" }}>{error}</p>}
-            <button disabled={loading} className='font-sans  bg-violet px-4 py-3 rounded-full text-white'>{loading ? 'Submitting...':'Sign In'}</button>
+            <button disabled={loading} className='font-sans  bg-violet px-4 py-3 rounded-full text-white'>{loading ? 'Submitting...' : 'Sign Up'}</button>
             <div className='flex mx-auto mb-2'>
               <p>Alreday have an Account?</p>
               <Link className='text-violet' to='/login'>Login</Link>
