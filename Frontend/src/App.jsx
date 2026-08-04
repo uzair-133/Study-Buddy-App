@@ -7,6 +7,8 @@ import ScrollToHash from './Components/ScrollToHash'
 import Forget from './Pages/Forget'
 import { useEffect } from 'react'
 import 'aos/dist/aos.css';
+import VerifyEmail from './Pages/VerifyEmail'
+import CheckYourEmail from './Components/CheckYourEmail'
 import AOS from 'aos';
 const App = () => {
   useEffect(() => {
@@ -27,7 +29,8 @@ const App = () => {
             <Route path='/login' element={<Login />} />
             <Route path='/signup' element={<SignUp />} />
             <Route path='/forget' element={<Forget />} />
-
+            <Route path="/verify-email/:token" element={<VerifyEmail />} />
+            <Route path="/check-your-email" element={<CheckYourEmail />} />
           </Routes>
         </BrowserRouter>
       </div>

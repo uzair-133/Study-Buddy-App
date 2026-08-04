@@ -7,7 +7,7 @@ const SignUp = () => {
   const [role, setRole] = useState('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false)
-  const  navigate = useNavigate()
+  const navigate = useNavigate()
   const [form, setFormData] = useState({
     name: "",
     email: "",
@@ -53,18 +53,20 @@ const SignUp = () => {
     }
     setLoading(true)
     try {
-      const res = await axios.post("https://jsonplaceholder.typicode.com/users", {
-        ...form,
+      const res = await axios.post("http://localhost:3000/api/auth/signup", {
+        name: form.name,
+        email: form.email,
+        password: form.password,
         role
       })
       console.log(res.data)
-      alert("Account Created Successfully");
+      alert(res.data.message);
       setFormData({ name: "", email: "", password: "", confirmPassword: "" })
-      navigate('/login')
+       navigate('/check-your-email', { state: { email: form.email } })
 
     }
     catch (err) {
-      console.log("error", err)
+      setError(err.response?.data?.message || "Something went wrong")
     }
     finally {
       setLoading(false)

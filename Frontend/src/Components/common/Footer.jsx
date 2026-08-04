@@ -8,8 +8,8 @@ const Footer = () => {
                  <p className='text-ink-soft text-sm font-sans'>&copy; 2026 StudyBuddy. All rights reserved.</p>
                 </section>
                 <section className='text-ink-soft text-sm font-sans flex space-x-4 pt-3    sm:pt-0'>
-                  <a href="">Features</a>
-                  <a href="">How Its Work</a>
+                  <Link to='/#features'>Features</Link>
+                  <Link to='/#how'>How its Works</Link>
                   <Link to='/login'>Log in</Link>
                 </section>
             </main>
