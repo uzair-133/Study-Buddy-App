@@ -19,6 +19,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["student", "teacher", "admin"],
         required: true
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
+    verificationToken:{
+        type:String
     }
 },{timestamps:true})
 
