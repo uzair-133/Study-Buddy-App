@@ -9,4 +9,7 @@ router.post('/login', authController.LogIn)
 
 router.get('/verify-email/:token',authController.verifyEmail)
 
+router.post('/forgot-password', authController.forgetPassword)
+router.post('/reset-password/:token', authController.resetPassword)
+
 module.exports = router

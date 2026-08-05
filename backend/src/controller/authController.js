@@ -2,7 +2,7 @@ const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
-const sendVerificationEmail = require('../utils/sendEmail')
+const {sendVerificationEmail,  resetPasswordEmail} = require('../utils/sendEmail')
 
 const SignUp = async (req, res) => {
     try {
@@ -39,6 +39,56 @@ const SignUp = async (req, res) => {
         res.status(500).json({
             message: "internal server error", err
         })
+    }
+}
+
+const forgetPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(403).json({
+                message: "invalid Email"
+            })
+        }
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        user.resetPasswordToken = resetToken
+        user.resetPasswordExpires = Date.now() + 15 * 60 * 1000
+        await user.save()
+
+        const resetLink = `http://localhost:5173/reset-password/${resetToken}`
+        await  resetPasswordEmail(user.email, resetLink)
+        res.json({ message: "Password reset link sent to your email" })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body
+
+        const user = await userModel.findOne({
+            resetPasswordToken: token,
+            resetPasswordExpires: { $gt: Date.now() }
+        })
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired reset link" })
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+        user.password = hashedPassword
+        user.resetPasswordToken = undefined
+        user.resetPasswordExpires = undefined
+        await user.save()
+        res.json({ message: "Password reset successful! You can now log in." })
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ message: "Internal server error" })
     }
 }
 
@@ -115,5 +165,7 @@ const LogIn = async (req, res) => {
 module.exports = {
     SignUp,
     verifyEmail,
+    forgetPassword,
+    resetPassword,
     LogIn
 }
