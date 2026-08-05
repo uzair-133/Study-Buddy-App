@@ -77,7 +77,7 @@ const Login = () => {
             <input onChange={handleChange} name='email' value={form.email} className='input-field' type="email" placeholder='Enter Email' />
             <div className='flex justify-between'>
               <label>Password</label>
-              <Link className='text-sm text-violet' to='/forget' >Forget Password ?</Link>
+              <Link className='text-sm text-violet' to='/forgot-password' >Forget Password ?</Link>
             </div>
             <input onChange={handleChange} name='password' value={form.password} className='input-field' type="password" placeholder='Password' />
             <label >Confirm Password</label>
