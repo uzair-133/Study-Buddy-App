@@ -11,6 +11,9 @@ import VerifyEmail from './Pages/VerifyEmail'
 import CheckYourEmail from './Components/CheckYourEmail'
 import Forgot from './Pages/Forget'
 import ResetPassword from './Pages/ResetPassword'
+import Student from './Pages/Dashboard/Student'
+import Teacher from './Pages/Dashboard/Teacher'
+import Admin from './Pages/Dashboard/Admin'
 import AOS from 'aos';
 const App = () => {
   useEffect(() => {
@@ -35,6 +38,9 @@ const App = () => {
             <Route path="/check-your-email" element={<CheckYourEmail />} />
             <Route path="/forgot-password" element={<Forgot/>} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/student" element={<Student />} />
+            <Route path="/teacher" element={<Teacher />} />
           </Routes>
         </BrowserRouter>
       </div>

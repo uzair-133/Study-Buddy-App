@@ -1,18 +1,18 @@
 import React from 'react'
-import { use } from 'react';
 import { useState } from 'react'
 import axios from 'axios';
 import Footer from '../Components/common/Footer';
 import Forget from './Forget';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const [form, setFormData] = useState({
     email: "",
     password: "",
-    confirmPassword: ""
   })
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -25,7 +25,7 @@ const Login = () => {
     setError('');
 
     //validation
-    if (!form.email || !form.password || !form.confirmPassword) {
+    if (!form.email || !form.password) {
       setError("All Fields is Required")
       return
     }
@@ -40,23 +40,36 @@ const Login = () => {
       return
     }
 
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match")
-      return
-    }
+    // no confirmPassword required for login
 
     setLoading(true)
     //api call
     try {
-      const res = await axios.post("https://jsonplaceholder.typicode.com/users", {
-        ...form
+      const res = await axios.post("http://localhost:3000/api/auth/login", {
+        email: form.email,
+        password: form.password
+      }, {
+        withCredentials: true,
       })
+
       console.log(res.data)
       alert("login successfully")
-      setFormData({ email: "", password: "", confirmPassword: "" })
+      setFormData({ email: "", password: "" })
+
+      const userRole = res.data.user.role;
+      if (userRole === "teacher") {
+        navigate('/teacher');
+      }
+      else if (userRole === "student") {
+        navigate('/student');
+      }
+      else if (userRole === "admin") {
+        navigate('/admin');
+      }
     }
     catch (err) {
       console.log("errror", err)
+      setError(err.response?.data?.message || "Something went wrong")
     }
     finally {
       setLoading(false)
@@ -80,8 +93,6 @@ const Login = () => {
               <Link className='text-sm text-violet' to='/forgot-password' >Forget Password ?</Link>
             </div>
             <input onChange={handleChange} name='password' value={form.password} className='input-field' type="password" placeholder='Password' />
-            <label >Confirm Password</label>
-            <input onChange={handleChange} name='confirmPassword' value={form.confirmPassword} className='input-field' type="password" placeholder='Confirm Password' />
             {error && <p style={{ color: "red" }}>{error}</p>}
             <button disabled={loading} className='font-sans  bg-violet px-4 py-3 rounded-full text-white'>{loading ? 'Submitting...' : 'Log In'}</button>
             <div className='flex mx-auto mb-2'>
