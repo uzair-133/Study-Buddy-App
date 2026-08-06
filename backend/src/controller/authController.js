@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const {sendVerificationEmail,  resetPasswordEmail} = require('../utils/sendEmail')
 
+// signup controller
 const SignUp = async (req, res) => {
     try {
         const { name, email, password, role = "student" } = req.body;
@@ -25,6 +26,7 @@ const SignUp = async (req, res) => {
             email,
             password: hashed,
             role,
+            systemRole:false,
             isVerified: false,
             verificationToken
         })
@@ -42,6 +44,26 @@ const SignUp = async (req, res) => {
     }
 }
 
+// verify email controller
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const user = await userModel.findOne({ verificationToken: token })
+        if (!user) {
+            return res.status(400).json({ message: "Invalid or expired verification link" })
+        }
+        user.isVerified = true
+        user.verificationToken = undefined
+        await user.save()
+        res.json({ message: "Email verified successfully! You can now log in." })
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ message: "Internal server error" })
+    }
+}
+
+// forget password controller
 const forgetPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -67,6 +89,7 @@ const forgetPassword = async (req, res) => {
     }
 }
 
+// reset password controller
 const resetPassword = async (req, res) => {
     try {
         const { token } = req.params;
@@ -92,23 +115,8 @@ const resetPassword = async (req, res) => {
     }
 }
 
-const verifyEmail = async (req, res) => {
-    try {
-        const { token } = req.params;
-        const user = await userModel.findOne({ verificationToken: token })
-        if (!user) {
-            return res.status(400).json({ message: "Invalid or expired verification link" })
-        }
-        user.isVerified = true
-        user.verificationToken = undefined
-        await user.save()
-        res.json({ message: "Email verified successfully! You can now log in." })
-    }
-    catch (err) {
-        console.log(err)
-        res.status(500).json({ message: "Internal server error" })
-    }
-}
+
+// login controller
 const LogIn = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -136,19 +144,22 @@ const LogIn = async (req, res) => {
         }
         const token = jwt.sign({
             id: user._id,
-            role: user.role,
+            role: user.role
         }, process.env.JWT_SECRET, {
             expiresIn: "7d"
         })
         res.cookie("token", token, {
-            httpOnly: true
+            httpOnly: true,
+            sameSite: 'lax',
+            secure: false
         });
         res.status(200).json({
-            message: "LOgin Successfully",
+            message: "Login Successfully",
+            token,
             user: {
                 id: user._id,
                 name: user.name,
-                role: user.role
+                role: user.role,
             }
         })
     }
@@ -161,11 +172,21 @@ const LogIn = async (req, res) => {
     }
 }
 
+const logOut = async (req,res) => {
+
+    res.clearCookie("token")
+    res.status(200).json({
+        message:"LogOut user"
+    })
+
+}
+
 
 module.exports = {
     SignUp,
     verifyEmail,
     forgetPassword,
     resetPassword,
-    LogIn
+    LogIn,
+    logOut
 }
