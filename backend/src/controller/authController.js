@@ -2,7 +2,7 @@ const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
-const {sendVerificationEmail,  resetPasswordEmail} = require('../utils/sendEmail')
+const { sendVerificationEmail, resetPasswordEmail } = require('../utils/sendEmail')
 
 // signup controller
 const SignUp = async (req, res) => {
@@ -26,16 +26,19 @@ const SignUp = async (req, res) => {
             email,
             password: hashed,
             role,
-            systemRole:false,
+            systemRole: false,
             isVerified: false,
             verificationToken
         })
-        const verificationLink = `http://localhost:5173/verify-email/${verificationToken}`
-        await sendVerificationEmail(email, verificationLink)
         res.status(201).json({
             message: "User Created Successfully",
             user
         })
+        const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`
+        sendVerificationEmail(email, verificationLink).catch(err => {
+            console.log("Email sending failed:", err)
+        })
+
     }
     catch (err) {
         res.status(500).json({
@@ -78,8 +81,8 @@ const forgetPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000
         await user.save()
 
-        const resetLink = `http://localhost:5173/reset-password/${resetToken}`
-        await  resetPasswordEmail(user.email, resetLink)
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+        await resetPasswordEmail(user.email, resetLink)
         res.json({ message: "Password reset link sent to your email" })
 
     }
@@ -144,7 +147,8 @@ const LogIn = async (req, res) => {
         }
         const token = jwt.sign({
             id: user._id,
-            role: user.role
+            role: user.role,
+            name: user.name,
         }, process.env.JWT_SECRET, {
             expiresIn: "7d"
         })
@@ -172,13 +176,27 @@ const LogIn = async (req, res) => {
     }
 }
 
-const logOut = async (req,res) => {
+const logOut = async (req, res) => {
 
     res.clearCookie("token")
     res.status(200).json({
-        message:"LogOut user"
+        message: "LogOut user"
     })
 
+}
+
+const getMe = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.id).select('-password')
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
+        res.json({ user })
+    } catch (err) {
+        res.status(500).json({ message: "Internal server error" })
+    }
 }
 
 
@@ -188,5 +206,6 @@ module.exports = {
     forgetPassword,
     resetPassword,
     LogIn,
-    logOut
+    logOut,
+    getMe
 }

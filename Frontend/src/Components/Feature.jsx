@@ -1,6 +1,7 @@
 import React from 'react'
 import FeatureCard from './FeatureCard'
 import { BookOpen, Zap, FilePenLine, CircleQuestionMark } from 'lucide-react'
+import { Translate } from '@boxicons/react'
 const Feature = () => {
     const Cardarr = [
         {
@@ -40,7 +41,7 @@ const Feature = () => {
                     <h1 className='text-2xl font-semibold font-sans md:text-3xl '>Built around how you actually study</h1>
                     <p className='text-ink-soft'>Four pieces that work together — from the first day of class to the night before the exam.</p>
                 </section>
-                <section className='grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8'>
+                <section className='grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 '>
                     {
                         Cardarr.map((e, index) => {
                             return <FeatureCard key={index} {...e} />

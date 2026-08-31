@@ -3,7 +3,7 @@ import React from 'react'
 const WorkCard = ({ no, iconColor, bgColor, title, des }) => {
     return (
         <>
-            <div className=' bg-paper-raised border border-line rounded-2xl p-4'>
+            <div className=' bg-paper-raised border border-line rounded-2xl p-4 hover:translate-y-1/12 transition ease-in'>
                 <div className={`w-10 h-10 rounded-full ${bgColor}  flex items-center justify-center mb-4`}>
                     <p className={`${iconColor} font-semibold`}>{no}</p>
                 </div>

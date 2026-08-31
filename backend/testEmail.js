@@ -1,7 +1,7 @@
 require('dotenv').config()
-const sendEmailVerification = require('./src/utils/sendEmail')
+const {sendVerificationEmail} = require('./src/utils/sendEmail')
 
-sendEmailVerification("seconduzair63@gmail.com",'http://test-link.com')
+sendVerificationEmail("seconduzair63@gmail.com",'http://test-link.com')
 .then(()=>{
     console.log("Email sent successfully")
 })

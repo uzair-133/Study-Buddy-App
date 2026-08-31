@@ -5,7 +5,7 @@ const authMiddleware = require('../middleware/authMiddleware')
 
 
 router.get('/dashboard',authMiddleware.authAdmin, (req, res) => {
-    res.json({ message: "Welcome to the admin dashboard!", user: req.user });
+    res.json({ message: "Welcome to the admin dashboard!"});
 })
 
 module.exports = router

@@ -4,7 +4,7 @@ const userModel = require("../models/userModel")
 
 const authStudent = async (req, res, next) => {
     try {
-        const  token = req.cookies.token;
+        const token = req.cookies.token;
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"
@@ -12,9 +12,10 @@ const authStudent = async (req, res, next) => {
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
         if (decoded.role !== "student") {
-            return res.status(401).json({ message: "YOU have not access to this page" })
+            return res.status(401).json({ message: "You have not access to this page" })
         }
-        req.user = decoded
+       
+        req.user = user
         next()
     }
     catch (err) {
@@ -25,7 +26,7 @@ const authStudent = async (req, res, next) => {
 }
 const authTeacher = async (req, res, next) => {
     try {
-        const  token  = req.cookies.token;
+        const token = req.cookies.token;
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"
@@ -35,7 +36,8 @@ const authTeacher = async (req, res, next) => {
         if (decoded.role !== "teacher") {
             return res.status(401).json({ message: "YOU have not access to this page" })
         }
-        req.user = decoded
+   
+        req.user = user
         next()
     }
     catch (err) {
@@ -46,7 +48,7 @@ const authTeacher = async (req, res, next) => {
 }
 const authAdmin = async (req, res, next) => {
     try {
-        const  token  = req.cookies.token;
+        const token = req.cookies.token;
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"
@@ -56,7 +58,8 @@ const authAdmin = async (req, res, next) => {
         if (decoded.role !== "admin") {
             return res.status(401).json({ message: "YOU have not access to this page" })
         }
-        req.user = decoded
+   
+        req.user = user
         next()
     }
     catch (err) {

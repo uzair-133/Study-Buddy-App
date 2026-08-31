@@ -7,10 +7,27 @@ const studentRoutes = require('./routes/studentRoutes')
 const adminroutes = require('./routes/adminRoutes')
 const cookieParser = require('cookie-parser')
 const cors = require("cors");
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-}));
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser())
 

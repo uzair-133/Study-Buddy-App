@@ -1,11 +1,13 @@
 import React from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { Mail } from 'lucide-react'
+import Navbar from './common/Navbar'
 const CheckYourEmail = () => {
     const location = useLocation()
     const email = location.state?.email
     return (
         <>
+            <Navbar />
             <div className="min-h-screen flex items-center justify-center px-4">
                 <div className="max-w-md text-center bg-paper-raised border border-line rounded-2xl p-8">
                     <Mail className="mx-auto text-violet mb-4" size={40} />
