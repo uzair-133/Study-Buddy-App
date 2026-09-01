@@ -1,20 +1,15 @@
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { UserContext } from "../../../Context/UserContext"
-import { useEffect } from "react"
-import { useState } from "react"
 
 const Welcome = () => {
-    const { user, fetchUser } = useContext(UserContext)
-    const [student,setStudent] = useState("student")
-    useEffect(() => {
-        fetchUser();
-    }, [])
+    const { user } = useContext(UserContext) || {}
+    const [student] = useState("student")
     return (
         <>
             <section className='flex flex-col-reverse gap-6 md:flex md:justify-between md:flex-row'>
                 <div>
                     <h1 className='font-semibold md:text-2xl font-display capitalize'>{user?.role || student} Dashboard</h1>
-                    <p className='font-semibold text-1xl  pt-2 text-violet font-sans'>Welcome back,{user.name || ''}!</p>
+                    <p className='font-semibold text-1xl  pt-2 text-violet font-sans'>Welcome back,{user?.name || ''}!</p>
                     <p className='text-ink-soft '>Here's what's happening across your subjects and classes.</p>
                 </div>
                 <div>

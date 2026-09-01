@@ -1,14 +1,13 @@
-import axios from 'axios'
-import React from 'react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { NavLink } from 'react-router-dom'
+import React, { useState, useContext } from 'react'
+import { useNavigate, NavLink } from 'react-router-dom'
 import { CornerDownRight } from 'lucide-react';
 import { toast } from "react-toastify";
-
 import api from '../../api/axios'
+import { UserContext } from '../../Context/UserContext'
+
 const LogOut = () => {
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext) || {};
     const [message, setMessage] = useState('')
     const handleLogout = async () => {
         try {
@@ -16,6 +15,7 @@ const LogOut = () => {
                 {}, {
                 withCredentials: true
             })
+            if (setUser) setUser(null);
             setMessage(res.data.message)
             toast.success("logout successfully")
             navigate('/login');

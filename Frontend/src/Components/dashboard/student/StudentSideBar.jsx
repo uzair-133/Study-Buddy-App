@@ -8,10 +8,8 @@ import { useEffect } from 'react'
 
 const StudentSideBar = ({ isOpen, setIsOpen }) => {
 
-  const {user, fetchUser} = useContext(UserContext) || { name: '', role: '' };
-  useEffect(() => {
-    fetchUser();
-  }   , []);
+  const { user } = useContext(UserContext) || {};
+
   const navItemClass = ({ isActive }) =>
     `flex items-center gap-2 px-3 py-2 mt-1 rounded-lg text-sm font-semibold ${isActive ? 'bg-violet/10 text-violet' : 'text-ink-soft hover:bg-paper'
     }`
@@ -46,11 +44,11 @@ const StudentSideBar = ({ isOpen, setIsOpen }) => {
 
       <div className='mt-16 border-t border-gray-300 flex space-x-2' >
         <div>
-          <p className='px-2.5 py-1 mt-2 w-fit bg-violet text-white text-sm font-semibold rounded-full'>{user.name.charAt(0).toUpperCase()}</p>
+          <p className='px-2.5 py-1 mt-2 w-fit bg-violet text-white text-sm font-semibold rounded-full'>{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}</p>
         </div>
         <div>
-          <h1 className='font-display font-semibold capitalize'>{user.name}</h1>
-          <p className='text-sm text-ink-soft capitalize'>{user.role}</p>
+          <h1 className='font-display font-semibold capitalize'>{user?.name || ''}</h1>
+          <p className='text-sm text-ink-soft capitalize'>{user?.role || ''}</p>
         </div>
       </div>
     </nav>

@@ -1,14 +1,10 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { UserContext } from '../../../Context/UserContext'
-import { useContext } from 'react'
-import { useEffect } from 'react'
+
 const Teacher = () => {
-  const { user, fetchUser } = useContext(UserContext) || { role: '', name: '' };
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const { user } = useContext(UserContext) || {};
   return (
-    <div>{user.role || 'Teacher'} {user.name || ''}</div>
+    <div>{user?.role || 'Teacher'} {user?.name || ''}</div>
   )
 }
 

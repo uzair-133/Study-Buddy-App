@@ -1,17 +1,27 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Navigate } from 'react-router-dom'
-import { UserContext } from '../../../Frontend/src/Context/UserContext'
-import { useContext } from 'react'
-const ProtectedRoutes = ({children, allowedRole}) => {
+import { UserContext } from '../Context/UserContext'
+
+const ProtectedRoutes = ({ children, allowedRole }) => {
     const { user, loading } = useContext(UserContext)
-    if (loading) return <p>Loading...</p>
-    if (!user) {
-        return <Navigate to='/login' />
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-paper">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-violet"></div>
+            </div>
+        )
     }
+
+    if (!user || !user.role) {
+        return <Navigate to='/login' replace />
+    }
+
     if (allowedRole && user.role !== allowedRole) {
-        return <Navigate to="/login" />  
+        return <Navigate to="/login" replace />  
     }
+
     return children   
 }
 
-export default ProtectedRoutes
+export default ProtectedRoutes
