@@ -24,6 +24,8 @@ import StudentSmartPrep from './Pages/Dashboard/Student/StudentSmartPrep'
 import StudentSearch from './Pages/Dashboard/Student/StudentSearch'
 import StudentSetting from './Pages/Dashboard/Student/StudentSetting'
 import StudentSubjects from './Pages/Dashboard/Student/StudentSubjects'
+import StudentSubjectDetail from './Pages/Dashboard/Student/StudentSubjectDetail'
+import StudentChapterDetail from './Pages/Dashboard/Student/StudentChapterDetail'
 
 //Teacher  imports
 import Teacher from './Pages/Dashboard/Teacher/Teacher'
@@ -71,6 +73,8 @@ const App = () => {
           >
             <Route index element={<Student />} />
             <Route path='subjects' element={<StudentSubjects />} />
+            <Route path='subjects/:subjectId' element={<StudentSubjectDetail />} />
+            <Route path='subjects/:subjectId/chapters/:chapterId' element={<StudentChapterDetail />} />
             <Route path='joined-classes' element={<StudentJoinedClass />} />
             <Route path='study-planner' element={<StudentStudyPlanner />} />
             <Route path='quiz-generator' element={<StudentQuiz />} />
