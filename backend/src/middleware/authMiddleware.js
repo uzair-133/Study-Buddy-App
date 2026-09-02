@@ -15,7 +15,7 @@ const authStudent = async (req, res, next) => {
             return res.status(401).json({ message: "You have not access to this page" })
         }
        
-        req.user = user
+        req.user = decoded
         next()
     }
     catch (err) {
@@ -37,7 +37,7 @@ const authTeacher = async (req, res, next) => {
             return res.status(401).json({ message: "YOU have not access to this page" })
         }
    
-        req.user = user
+        req.user = decoded
         next()
     }
     catch (err) {
@@ -59,7 +59,7 @@ const authAdmin = async (req, res, next) => {
             return res.status(401).json({ message: "YOU have not access to this page" })
         }
    
-        req.user = user
+        req.user = decoded
         next()
     }
     catch (err) {
@@ -75,3 +75,7 @@ module.exports = {
     authTeacher,
     authAdmin
 }
+
+
+
+

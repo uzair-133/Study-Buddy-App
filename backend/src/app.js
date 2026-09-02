@@ -1,17 +1,18 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 
-const authRoutes = require('./routes/authRoutes')
-const teacherRoutes = require('./routes/teacherRoutes')
-const studentRoutes = require('./routes/studentRoutes')
-const adminroutes = require('./routes/adminRoutes')
-const cookieParser = require('cookie-parser')
+const authRoutes = require("./routes/authRoutes");
+const teacherRoutes = require("./routes/teacherRoutes");
+const studentRoutes = require("./routes/studentRoutes");
+const adminroutes = require("./routes/adminRoutes");
+const subjectRoutes = require("./routes/subjectRoutes");
+const chapterRoutes = require("./routes/chapterRoutes");
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
-
 const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
-  process.env.FRONTEND_URL
+  process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 const corsOptions = {
@@ -29,14 +30,18 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
-app.use('/api/auth', authRoutes)
+app.use("/api/auth", authRoutes);
 
-app.use('/api/teacher', teacherRoutes)
+app.use("/api/teacher", teacherRoutes);
 
-app.use('/api/student', studentRoutes)
+app.use("/api/student", studentRoutes);
 
-app.use('/api/admin', adminroutes)
+app.use("/api/admin", adminroutes);
+
+app.use("/api/subject", subjectRoutes);
+
+app.use("/api/chapter", chapterRoutes);
 
 module.exports = app;
