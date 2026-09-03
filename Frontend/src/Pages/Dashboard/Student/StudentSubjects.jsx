@@ -13,7 +13,7 @@ const StudentSubjects = () => {
     const fetchSubjects = async () => {
       try {
         const res = await api.get('/api/subject/getSubject', { withCredentials: true })
-        setSubjects(res.data.subject)   // yeh ARRAY hai, isi ko state mein daala
+        setSubjects(res.data.subject)
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch subjects')
       } finally {
