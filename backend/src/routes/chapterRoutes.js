@@ -4,9 +4,12 @@ const {authStudent}  = require('../middleware/authMiddleware')
 const {createChapter, getChapter,deleteChapter} = require('../controller/chapterController')
 
 
-router.post('/createChapter',authStudent,createChapter);
-router.get('/getchapter',authStudent,getChapter);
-router.delete('/delete/:chapterId',authStudent,deleteChapter);
+router.post('/createChapter', authStudent, createChapter);
+router.post('/createChapter/:subjectId', authStudent, createChapter);
 
+router.get('/getchapter', authStudent, getChapter);
+router.get('/getchapter/:subjectId', authStudent, getChapter);
+
+router.delete('/delete/:chapterId', authStudent, deleteChapter);
 
 module.exports = router;
