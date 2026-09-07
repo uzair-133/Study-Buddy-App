@@ -22,7 +22,7 @@ const MainBento = () => {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-2 xs:grid xs:grid-cols-2 sm:grid sm:grid-cols-2  md:grid md:grid-cols-3 md:gap-3 lg:grid lg:grid-cols-2">
-          {Subject.map((e, index) => {
+          {subject.map((e, index) => {
             return <YourSubject key={index} {...e} />;
           })}
         </div>

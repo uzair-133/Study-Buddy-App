@@ -8,6 +8,7 @@ const adminroutes = require("./routes/adminRoutes");
 const subjectRoutes = require("./routes/subjectRoutes");
 const chapterRoutes = require("./routes/chapterRoutes");
 const cookieParser = require("cookie-parser");
+const materialRoutes = require('./routes/materialRoutes')
 const cors = require("cors");
 const allowedOrigins = [
   "http://localhost:5173",
@@ -43,5 +44,7 @@ app.use("/api/admin", adminroutes);
 app.use("/api/subject", subjectRoutes);
 
 app.use("/api/chapter", chapterRoutes);
+
+app.use("/api/material",materialRoutes)
 
 module.exports = app;
