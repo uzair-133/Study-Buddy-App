@@ -2,64 +2,97 @@ const materialModal = require('../models/materialModal');
 const { uploadFile } = require('../services/storage.service');
 
 
+// FIX: Updated uploadMaterial to accept file under any field name, auto-fallback fileName to uploaded file's original name, extract category/chapterId/subjectId, use correct model field 'fileUrl', and attach studentId (req.user.id)
 const uploadMaterial = async (req, res) => {
     try {
-        const { fileName } = req.body;
-        const file = req.file;
+        const file = req.file || (req.files && req.files[0]);
 
-        const result = await uploadFile(file.buffer.toString('base64'))
+        if (!file) {
+            return res.status(400).json({ message: "File is required" });
+        }
+
+        const { category, chapterId, subjectId } = req.body;
+        const fileName = req.body.fileName || file.originalname;
+
+        if (!category || !chapterId || !subjectId) {
+            return res.status(400).json({ message: "category, chapterId, and subjectId are required fields" });
+        }
+
+        const result = await uploadFile(file.buffer.toString('base64'));
 
         const material = await materialModal.create({
-            uri: result.fileUrl,
             fileName,
-            category
-        })
+            fileUrl: result.url || result.fileUrl,
+            category,
+            studentId: req.user.id,
+            chapterId,
+            subjectId
+        });
+
         res.status(201).json({
             message: "Material Uploaded Successfully",
             material
-
-        })
+        });
     }
     catch (err) {
+        console.error("Error in uploadMaterial:", err);
         res.status(500).json({
-            message: "internal server error", err
-        })
+            message: "Internal server error",
+            error: err.message
+        });
     }
 }
+
+
+// FIX: Updated getMaterial to filter by authenticated studentId (req.user.id) and construct clean optional query filters
 const getMaterial = async (req, res) => {
-
-    const { studentId, chapterId, subjectId } = req.query;
     try {
-        const materials = await materialModal.find({
-            studentId,
-            chapterId,
-            subjectId
+        const { chapterId, subjectId, category } = req.query;
+        const filter = { studentId: req.user.id };
 
-        })
-        res.status(200).json(materials)
+        if (chapterId) filter.chapterId = chapterId;
+        if (subjectId) filter.subjectId = subjectId;
+        if (category) filter.category = category;
+
+        const materials = await materialModal.find(filter).sort({ createdAt: -1 });
+        res.status(200).json(materials);
     }
     catch (err) {
+        console.error("Error in getMaterial:", err);
         res.status(500).json({
-            message: "internal server error", err
-        })
+            message: "Internal server error",
+            error: err.message
+        });
     }
 }
+
+// FIX: Updated deleteMaterial to verify ownership by studentId (req.user.id) before deleting
 const deleteMaterial = async (req, res) => {
     const { materialId } = req.params;
     try {
-        const material = await materialModal.findByIdAndDelete(materialId)  
+        const material = await materialModal.findOneAndDelete({
+            _id: materialId,
+            studentId: req.user.id
+        });
+
+        if (!material) {
+            return res.status(404).json({ message: "Material not found or unauthorized" });
+        }
+
         res.status(200).json({
             message: "Material deleted successfully",
             material
-        })
+        });
     }
     catch (err) {
+        console.error("Error in deleteMaterial:", err);
         res.status(500).json({
-            message: "internal server error", err
-        })
+            message: "Internal server error",
+            error: err.message
+        });
     }
-
 }
+
 
 
 module.exports = {

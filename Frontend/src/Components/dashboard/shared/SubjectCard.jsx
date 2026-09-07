@@ -1,46 +1,59 @@
-import { useState, useEffect } from 'react'
-import api from '../../../api/axios'
-import { EllipsisVertical, Trash2 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from "react";
+import api from "../../../api/axios";
+import { EllipsisVertical, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const SubjectCard = ({ subject, onDelete }) => {
-  const [chapterCount, setChapterCount] = useState(0)
-  const [fileCount, setFileCount] = useState(0)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const navigate = useNavigate()
+  const [chapterCount, setChapterCount] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const chapterRes = await api.get(`/api/chapter/getchapter/${subject._id}`, { withCredentials: true })
-        setChapterCount(chapterRes.data.chapter?.length || 0)
+        const chapterRes = await api.get(
+          `/api/chapter/getchapter/${subject._id}`,
+          { withCredentials: true },
+        );
+        setChapterCount(chapterRes.data.chapter?.length || 0);
+        // FIX: Pass subjectId in params so only materials for this specific subject are counted
+        const materialRes = await api.get("/api/material/materials", {
+          params: { subjectId: subject._id },
+          withCredentials: true,
+        });
+
+        setFileCount(materialRes.data?.length || 0);
+
       } catch (err) {
-        console.log(err)
+        console.log(err);
       }
-    }
+    };
     if (subject?._id) {
-      fetchCounts()
+      fetchCounts();
     }
-  }, [subject?._id])
+  }, [subject?._id]);
 
   const handleDelete = async (e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     try {
-      await api.delete(`/api/subject/delete/${subject._id}`, { withCredentials: true })
-      onDelete(subject._id)
+      await api.delete(`/api/subject/delete/${subject._id}`, {
+        withCredentials: true,
+      });
+      onDelete(subject._id);
     } catch (err) {
-      console.log(err)
+      console.log(err);
     }
-  }
+  };
 
   const handleCardClick = () => {
     if (subject?._id) {
-      navigate(`/student/subjects/${subject._id}`)
+      navigate(`/student/subjects/${subject._id}`);
     }
-  }
+  };
 
   return (
-    <div 
+    <div
       onClick={handleCardClick}
       className="bg-white rounded-xl border border-line p-5 relative cursor-pointer hover:shadow-md transition-all hover:border-violet/40"
     >
@@ -76,7 +89,7 @@ const SubjectCard = ({ subject, onDelete }) => {
         My Subject
       </span>
     </div>
-  )
-}
+  );
+};
 
-export default SubjectCard
+export default SubjectCard;

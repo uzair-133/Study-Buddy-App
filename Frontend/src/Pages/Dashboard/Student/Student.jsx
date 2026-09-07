@@ -17,9 +17,13 @@ const Student = () => {
         const subjectRes = await api.get("/api/subject/getSubject", {
           withCredentials: true,
         });
+        const materialRes = await api.get("/api/material/materials", {
+          withCredentials: true,
+        });
         setStats((prev) => ({
           ...prev,
           subjects: subjectRes.data.subject.length,
+          filesUploaded: materialRes.data.length,
         }));
       } catch (err) {
         console.log(err);
