@@ -9,7 +9,7 @@ const uploadFile = async (file)=> {
     const result = await client.files.upload({
         file,
         fileName:"studyMaterialFile_" + Date.now(),
-        folder:"/studyBuddyFolder/files"
+        folder:"/00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000studyBuddyFolder/files"
     })
     return result;
 }

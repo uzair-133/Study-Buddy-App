@@ -2,7 +2,6 @@ const materialModal = require('../models/materialModal');
 const { uploadFile } = require('../services/storage.service');
 
 
-// FIX: Updated uploadMaterial to accept file under any field name, auto-fallback fileName to uploaded file's original name, extract category/chapterId/subjectId, use correct model field 'fileUrl', and attach studentId (req.user.id)
 const uploadMaterial = async (req, res) => {
     try {
         const file = req.file || (req.files && req.files[0]);
@@ -43,8 +42,6 @@ const uploadMaterial = async (req, res) => {
     }
 }
 
-
-// FIX: Updated getMaterial to filter by authenticated studentId (req.user.id) and construct clean optional query filters
 const getMaterial = async (req, res) => {
     try {
         const { chapterId, subjectId, category } = req.query;
@@ -66,7 +63,6 @@ const getMaterial = async (req, res) => {
     }
 }
 
-// FIX: Updated deleteMaterial to verify ownership by studentId (req.user.id) before deleting
 const deleteMaterial = async (req, res) => {
     const { materialId } = req.params;
     try {

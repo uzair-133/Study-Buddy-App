@@ -116,7 +116,7 @@ const StudentChapterDetail = () => {
               <span className="p-1.5 rounded-lg bg-violet/10 text-violet">
                 <BookOpen size={20} />
               </span>
-              <h1 className="font-display font-bold text-2xl md:text-3xl text-ink">
+              <h1 className="font-display  text-2xl md:text-2xl text-ink">
                 {chapterTitle}
               </h1>
             </div>
