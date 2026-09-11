@@ -1,9 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 const YourExamPrep = () => {
+  const navigate = useNavigate()
+  const handleClick = () => {
+    navigate('/student/smart-prep')
+  }
   return (
   <>
-     <main className='relative overflow-hidden rounded-3xl bg-violet mt-8 '>
+     <main onClick={handleClick} className='relative overflow-hidden rounded-3xl bg-violet mt-8 '>
                 <div className=' absolute  -top-4 -right-4 w-25 h-25 rounded-full  bg-coral opacity-30'></div>
                 <section className='p-5'>
                     <div>
