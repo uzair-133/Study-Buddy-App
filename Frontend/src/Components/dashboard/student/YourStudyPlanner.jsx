@@ -1,29 +1,30 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
+import api from '../../../api/axios'
+import { useEffect, useState } from 'react'
 const YourStudyPlanner = () => {
-  const StudyPlannerData = [
-    {
-      date: 14,
-      month: "Aug",
-      subject: "Physics",
-      chapter: "Ch 2 & 5",
-      note: "Revised"
-    },
-    {
-      date: 5,
-      month: "Sep",
-      subject: "Chemistry",
-      chapter: "Ch 1",
-      note: "New Topic"
-    },
-    {
-      date: 2,
-      month: "Sep",
-      subject: "Bio",
-      chapter: "Ch 3",
-      note: "Test Prep"
+  const [tasks, setTask] = useState([])
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+
+  const getTask = async () => {
+    try {
+      const res = await api.get('/api/task/get')
+      setTask(res.data.task || [])
+      setError('')
     }
-  ]
+    catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch tasks')
+
+    } finally {
+      setLoading(false)
+    }
+  }
+  useEffect(() => {
+    getTask();
+  }, [])
+
+
   return (
     <>
       <section className='bg-white rounded-2xl p-4 border  border-gray-300 '>
@@ -33,16 +34,17 @@ const YourStudyPlanner = () => {
         </div>
         <div>
           {
-            StudyPlannerData.map((e, index) => {
+            tasks.map((e, index) => {
               return (
                 <>
                   <div key={index} {...e} className='flex space-x-2 space-y-2 mt-3 border-b border-gray-200'>
                     <div className='rounded-md bg-gray-100 leading-4 px-2 py-1  font-semibold font-display text-[13px] '>
-                      <p className=''>{e.date}</p>
-                      <p className=''>{e.month}</p>
+                      <span>                                   
+                       {new Date(e.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                      </span>
                     </div>
                     <div>
-                      <p className='text-sm font-sans font-semibold'>{e.subject} {e.chapter}</p>
+                      <p className='text-sm font-sans font-semibold'>{e.title}</p>
                       <p className='text-ink-soft text-sm font-sans'>{e.note}</p>
 
                     </div>

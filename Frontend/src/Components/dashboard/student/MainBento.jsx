@@ -5,9 +5,28 @@ import YourExamPrep from "./YourExamPrep";
 import YourQuiz from "./YourQuiz";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../../../api/axios";
 
 const MainBento = () => {
-  const [subject, setSubject] = useState([]);
+  const [subjects, setSubject] = useState([]);
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(true)
+   const getSubject = async () => {
+    try {
+      const res = await api.get('/api/subject/getSubject', { withCredentials: true })
+      setSubject(res.data.subject || []);
+      setError('')
+    }
+    catch (err) {
+      setError(err.response?.data?.message || "something went wrong");
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getSubject();
+  }, [])
 
   return (
     <main className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5 pt-6">
@@ -22,7 +41,7 @@ const MainBento = () => {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-2 xs:grid xs:grid-cols-2 sm:grid sm:grid-cols-2  md:grid md:grid-cols-3 md:gap-3 lg:grid lg:grid-cols-2">
-          {subject.map((e, index) => {
+          {subjects.map((e, index) => {
             return <YourSubject key={index} {...e} />;
           })}
         </div>
