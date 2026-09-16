@@ -14,7 +14,7 @@ const updateProfile = async (req, res) => {
       .findByIdAndUpdate(
         req.user.id,
         { profileImage: result.url || result.fileUrl },
-        { new: true },
+        { returnDocument: 'after' }
       )
       .select("-password");
 
@@ -59,7 +59,7 @@ const updateName = async (req, res) => {
     }
 
     const updateN = await userModel
-      .findByIdAndUpdate(req.user.id, { name }, { new: true })
+      .findByIdAndUpdate(req.user.id, { name }, { returnDocument: 'after' })
       .select("-password");
     res.status(200).json({
       message: "Name Updated Successfully",
