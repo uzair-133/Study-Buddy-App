@@ -14,4 +14,5 @@ const uploadFile = async (file)=> {
     return result;
 }
 
+
 module.exports = {uploadFile}

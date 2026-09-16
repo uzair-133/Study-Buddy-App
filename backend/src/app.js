@@ -10,6 +10,7 @@ const chapterRoutes = require("./routes/chapterRoutes");
 const cookieParser = require("cookie-parser");
 const materialRoutes = require('./routes/materialRoutes')
 const taskRoutes =  require('./routes/taskRoutes');
+const userRoutes = require('./routes/userRoutes');
 const cors = require("cors");
 const allowedOrigins = [
   "http://localhost:5173",
@@ -51,5 +52,7 @@ app.use("/api/chapter", chapterRoutes);
 app.use("/api/material",materialRoutes)
 
 app.use("/api/task", taskRoutes);
+
+app.use("/api/user", userRoutes);
 
 module.exports = app;
