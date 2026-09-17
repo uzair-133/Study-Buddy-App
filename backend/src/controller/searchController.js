@@ -2,44 +2,54 @@ const subjectModel = require("../models/subjectModel");
 const chapterModel = require("../models/chapterModal");
 const materialModel = require("../models/materialModal");
 
-
 const searchAll = async (req, res) => {
-    try {
-        const { keyword } = req.query;
-        if (!keyword) {
-            return res.status(400).json({ message: "Keyword is required" })
-        }
-        const subject = await subjectModel.find({
-            title: { $regex: keyword, $options: "i" },
-            studentId: req.user.id,
-        })
+  try {
+    const { keyword, category } = req.query;
 
-        const chapter = await chapterModel.find({
-            title: { $regex: keyword, $options: "i" },
-            studentId: req.user.id,
-        })
-
-        const material = await materialModel.find({
-            fileName: { $regex: keyword, $options: "i" },
-            studentId: req.user.id,
-        })
-
-        const allData = {
-            subject: subject,
-            chapter: chapter,
-            material: material
-        }
-        res.status(200).json({
-            message: "Get All Data",
-            allData
-        })
+    if (!keyword || !keyword.trim()) {
+      return res.status(200).json({
+        message: "Get All Data",
+        allData: { subject: [], chapter: [], material: [] },
+      });
     }
-    catch (err) {
-        res.status(500).json({
-            message: "internal Server Error"
-        })
-    }
-}
 
+    const studentId = req.user.id;
+    const regex = { $regex: keyword.trim(), $options: "i" };
 
-module.exports = {searchAll}
+    const subject =
+      !category || category === "all" || category === "subject"
+        ? await subjectModel
+            .find({ title: regex, studentId })
+            .sort({ createdAt: -1 })
+        : [];
+
+    const chapter =
+      !category || category === "all" || category === "chapter"
+        ? await chapterModel
+            .find({ title: regex, studentId })
+            .populate("subjectId", "title")
+            .sort({ createdAt: -1 })
+        : [];
+
+    const material =
+      !category ||
+      category === "all" ||
+      category === "files" ||
+      category === "material"
+        ? await materialModel
+            .find({ fileName: regex, studentId })
+            .populate("subjectId", "title")
+            .populate("chapterId", "title")
+            .sort({ createdAt: -1 })
+        : [];
+
+    res.status(200).json({
+      message: "Get All Data",
+      allData: { subject, chapter, material },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { searchAll };
