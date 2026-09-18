@@ -8,7 +8,7 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ message: "File is required" });
     }
 
-    const result = await uploadFile(file.buffer.toString("base64"));
+    const result = await uploadFile(file.buffer.toString("base64"), file.originalname || "avatar.jpg");
 
     const updatedUser = await userModel
       .findByIdAndUpdate(

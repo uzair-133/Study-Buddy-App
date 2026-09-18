@@ -17,7 +17,7 @@ const uploadMaterial = async (req, res) => {
             return res.status(400).json({ message: "category, chapterId, and subjectId are required fields" });
         }
 
-        const result = await uploadFile(file.buffer.toString('base64'));
+        const result = await uploadFile(file.buffer.toString('base64'), file.originalname || fileName);
 
         const material = await materialModal.create({
             fileName,

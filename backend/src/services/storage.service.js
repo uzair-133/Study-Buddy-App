@@ -1,18 +1,22 @@
-const {ImageKit} = require('@imagekit/nodejs')
+const path = require('path');
+const { ImageKit } = require('@imagekit/nodejs');
 
 const client = new ImageKit({
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY, // This is the default and can be omitted
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
 
+const uploadFile = async (file, originalName = 'studyMaterialFile') => {
+    const ext = path.extname(originalName) || '';
+    const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const safeFileName = `${baseName}_${Date.now()}${ext}`;
 
-const uploadFile = async (file)=> {
     const result = await client.files.upload({
         file,
-        fileName:"studyMaterialFile_" + Date.now(),
-        folder:"/00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000studyBuddyFolder/files"
-    })
+        fileName: safeFileName,
+        useUniqueFileName: true,
+        folder: "/00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000studyBuddyFolder/files"
+    });
     return result;
 }
 
-
-module.exports = {uploadFile}
+module.exports = { uploadFile };

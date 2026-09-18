@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import api from '../../../api/axios';
 import { FileText, Eye, Trash2, Loader2, ExternalLink } from 'lucide-react';
+import { openFileViewer } from '../../../utils/fileViewer';
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return 'Recently uploaded';
@@ -40,7 +41,7 @@ const MaterialFile = ({ material, onDelete }) => {
 
   const handleView = () => {
     if (material?.fileUrl) {
-      window.open(material.fileUrl, '_blank', 'noopener,noreferrer');
+      openFileViewer(material.fileUrl, material.fileName);
     }
   };
 
