@@ -12,6 +12,7 @@ const materialRoutes = require('./routes/materialRoutes')
 const taskRoutes =  require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 const cors = require("cors");
 const allowedOrigins = [
   "http://localhost:5173",
@@ -57,6 +58,8 @@ app.use("/api/task", taskRoutes);
 app.use("/api/user", userRoutes);
 
 app.use("/api/search", searchRoutes);
+
+app.use("/api/quiz", quizRoutes);
 
 
 module.exports = app;

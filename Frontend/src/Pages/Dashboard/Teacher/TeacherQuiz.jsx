@@ -1,9 +1,8 @@
 import React from 'react'
+import StudentQuiz from '../Student/StudentQuiz'
 
 const TeacherQuiz = () => {
-  return (
-    <div>TeacherQuiz</div>
-  )
+  return <StudentQuiz />
 }
 
 export default TeacherQuiz
