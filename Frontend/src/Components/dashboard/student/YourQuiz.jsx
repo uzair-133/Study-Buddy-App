@@ -106,7 +106,7 @@ const YourQuiz = () => {
         </h1>
         <button
           onClick={() => navigate("/student/quiz-generator")}
-          className="text-violet text-xs font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+          className="text-violet text-xs font-semibold font-display hover:underline flex items-center gap-1 cursor-pointer"
         >
           Open Generator <ArrowRight className="w-3.5 h-3.5" />
         </button>
@@ -123,7 +123,7 @@ const YourQuiz = () => {
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
-          className="bg-white border border-line rounded-xl px-3.5 py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
+          className="bg-paper border font-sans border-line rounded-xl px-3.5 py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
         >
           <option value="">Select Subject</option>
           {subjects.map((sub) => (
@@ -138,7 +138,7 @@ const YourQuiz = () => {
           value={selectedChapter}
           onChange={(e) => setSelectedChapter(e.target.value)}
           disabled={!selectedSubject || loadingChapters}
-          className="bg-white border border-line rounded-xl px-3.5 py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40 disabled:opacity-50"
+          className="bg-paper border border-line rounded-xl px-3.5 py-2 text-xs font-semibold font-sans text-ink focus:outline-none focus:ring-2 focus:ring-violet/40 disabled:opacity-50"
         >
           <option value="">
             {loadingChapters ? "Loading..." : "Select Chapter"}
@@ -165,7 +165,7 @@ const YourQuiz = () => {
         <select
           value={mode}
           onChange={(e) => setMode(e.target.value)}
-          className="bg-white border border-line rounded-xl px-3.5 py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
+          className="bg-paper border border-line rounded-xl px-3.5 py-2 text-xs font-semibold font-sans text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
         >
           <option value="mcq">MCQs Mode</option>
           <option value="question">Questions Only</option>
