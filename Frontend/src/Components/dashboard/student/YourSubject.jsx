@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import api from '../../../api/axios'
-import { useNavigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 const YourSubject = ({ title, type, _id }) => {
 
   const [chapter, setChapter] = useState(0);
   const [error, setError] = useState('')
   const [file, setFileCount] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const data = async () => {
     try {
@@ -34,7 +34,8 @@ params: { subjectId: _id },
   }, [_id])
 
   const handleClick = () => {
-    navigate(`/student/subjects/${_id}`);
+    const basePath = location.pathname.startsWith('/teacher') ? '/teacher' : '/student';
+    navigate(`${basePath}/subjects/${_id}`);
   }
   return (
     <>

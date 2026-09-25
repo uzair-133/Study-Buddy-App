@@ -20,7 +20,7 @@ const TeacherLayout = () => {
       {/* Neeche wala hissa: Sidebar + Content, side by side */}
       <div className="flex flex-1">
         <TeacherSideBar isOpen={isOpen} setIsOpen={setIsOpen} />
-        <main className="flex-1">
+        <main className="flex-1  bg-paper">
           <Outlet />
         </main>
       </div>

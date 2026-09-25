@@ -23,6 +23,9 @@ const TeacherSideBar = ({ isOpen, setIsOpen }) => {
       <NavLink to='/teacher/create-classes' className={navItemClass} onClick={() => setIsOpen(false)}>
         <Users size={18} /> Joined Classes
       </NavLink>
+      <NavLink to='/teacher/study-planner' className={navItemClass} onClick={() => setIsOpen(false)}>
+        <Calendar size={18} /> Study Planner
+      </NavLink>
       <NavLink to='/teacher/quiz-generator' className={navItemClass} onClick={() => setIsOpen(false)}>
         <HelpCircle size={18} /> Quiz Generator
       </NavLink>

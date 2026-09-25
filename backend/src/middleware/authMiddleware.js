@@ -11,7 +11,7 @@ const authStudent = async (req, res, next) => {
             })
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        if (decoded.role !== "student") {
+        if (!["student", "teacher", "admin"].includes(decoded.role)) {
             return res.status(401).json({ message: "You have not access to this page" })
         }
        
@@ -33,7 +33,7 @@ const authTeacher = async (req, res, next) => {
             })
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        if (decoded.role !== "teacher") {
+        if (!["teacher", "admin"].includes(decoded.role)) {
             return res.status(401).json({ message: "YOU have not access to this page" })
         }
    
@@ -75,7 +75,3 @@ module.exports = {
     authTeacher,
     authAdmin
 }
-
-
-
-

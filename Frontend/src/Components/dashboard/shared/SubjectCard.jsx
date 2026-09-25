@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "../../../api/axios";
 import { EllipsisVertical, Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const SubjectCard = ({ subject, onDelete }) => {
   const [chapterCount, setChapterCount] = useState(0);
   const [fileCount, setFileCount] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchCounts = async () => {
@@ -17,14 +18,13 @@ const SubjectCard = ({ subject, onDelete }) => {
           { withCredentials: true },
         );
         setChapterCount(chapterRes.data.chapter?.length || 0);
-        // FIX: Pass subjectId in params so only materials for this specific subject are counted
+
         const materialRes = await api.get("/api/material/materials", {
           params: { subjectId: subject._id },
           withCredentials: true,
         });
 
         setFileCount(materialRes.data?.length || 0);
-
       } catch (err) {
         console.log(err);
       }
@@ -48,7 +48,10 @@ const SubjectCard = ({ subject, onDelete }) => {
 
   const handleCardClick = () => {
     if (subject?._id) {
-      navigate(`/student/subjects/${subject._id}`);
+      const basePath = location.pathname.startsWith("/teacher")
+        ? "/teacher"
+        : "/student";
+      navigate(`${basePath}/subjects/${subject._id}`);
     }
   };
 

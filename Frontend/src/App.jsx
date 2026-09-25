@@ -31,10 +31,13 @@ import StudentChapterDetail from './Pages/Dashboard/Student/StudentChapterDetail
 import Teacher from './Pages/Dashboard/Teacher/Teacher'
 import TeacherLayout from './Components/dashboard/teacher/TeacherLayout'
 import TeacherSubjects from './Pages/Dashboard/Teacher/TeacherSubjects'
+import TeacherSubjectDetail from './Pages/Dashboard/Teacher/TeacherSubjectDetail'
+import TeacherChapterDetail from './Pages/Dashboard/Teacher/TeacherChapterDetail'
 import TeacherCreateClass from './Pages/Dashboard/Teacher/TeacherCreateClass'
 import TeacherQuiz from './Pages/Dashboard/Teacher/TeacherQuiz'
 import TeacherSearch from './Pages/Dashboard/Teacher/TeacherSearch'
 import TeacherSetting from './Pages/Dashboard/Teacher/TeacherSetting'
+import TeacherStudyPlanner from './Pages/Dashboard/Teacher/TeacherStudyPlanner'
 
 
 //Admin imports
@@ -90,7 +93,10 @@ const App = () => {
             </ProtectedRoutes>}>
               <Route index element={<Teacher />} />
               <Route path='subjects' element={<TeacherSubjects />} />
+              <Route path='subjects/:subjectId' element={<TeacherSubjectDetail />} />
+              <Route path='subjects/:subjectId/chapters/:chapterId' element={<TeacherChapterDetail />} />
               <Route path='create-classes' element={<TeacherCreateClass />} />
+              <Route path='study-planner' element={<TeacherStudyPlanner />} />
               <Route path='quiz-generator' element={<TeacherQuiz />} />
               <Route path='search' element={<TeacherSearch />} />
               <Route path='setting' element={<TeacherSetting />} />

@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import api from "../../../api/axios";
 import YourSubject from "./YourSubject";
 import YourStudyPlanner from "./YourStudyPlanner";
 import YourExamPrep from "./YourExamPrep";
 import YourQuiz from "./YourQuiz";
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import api from "../../../api/axios";
 
 const MainBento = () => {
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/teacher') ? '/teacher' : '/student';
   const [subjects, setSubject] = useState([]);
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -34,7 +35,7 @@ const MainBento = () => {
         <div className="flex justify-between">
           <h1 className="font-semibold font-display">Your Subjects</h1>
           <Link
-            to="/student/subjects"
+            to={`${basePath}/subjects`}
             className="text-violet text-sm font-sans font-semibold"
           >
             View all

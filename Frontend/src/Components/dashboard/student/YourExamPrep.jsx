@@ -1,14 +1,17 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+
 const YourExamPrep = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const basePath = location.pathname.startsWith('/teacher') ? '/teacher' : '/student'
+
   const handleClick = () => {
-    navigate('/student/smart-prep')
+    navigate(`${basePath}/smart-prep`)
   }
   return (
   <>
-     <main onClick={handleClick} className='relative overflow-hidden rounded-3xl bg-violet mt-8 '>
+     <main onClick={handleClick} className='relative overflow-hidden rounded-3xl bg-violet mt-8 cursor-pointer'>
                 <div className=' absolute  -top-4 -right-4 w-25 h-25 rounded-full  bg-coral opacity-30'></div>
                 <section className='p-5'>
                     <div>
@@ -16,7 +19,7 @@ const YourExamPrep = () => {
                         <p className='text-gray-300 font-sans text-sm'>Gather every note, slide and question from your chapters in one view.</p>
                     </div>
                     <div className='mt-2'>
-                        <Link className=' font-semibold font-sans  relative z-0 bg-white text-violet px-3 py-1 rounded-full text-sm ' to='/student/smart-prep'><button>Start Smart Prep</button></Link>
+                        <Link className=' font-semibold font-sans  relative z-0 bg-white text-violet px-3 py-1 rounded-full text-sm ' to={`${basePath}/smart-prep`}><button>Start Smart Prep</button></Link>
                     </div>
 
                 </section>

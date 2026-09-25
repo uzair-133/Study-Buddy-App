@@ -7,11 +7,13 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../../api/axios";
 
 const YourQuiz = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const basePath = location.pathname.startsWith('/teacher') ? '/teacher' : '/student';
 
   // State
   const [subjects, setSubjects] = useState([]);
@@ -86,12 +88,12 @@ const YourQuiz = () => {
       });
 
       if (res.data?.success) {
-        navigate("/student/quiz-generator");
+        navigate(`${basePath}/quiz-generator`);
       }
     } catch (err) {
       console.error("Error generating quiz from dashboard widget:", err);
       // Navigate to generator page if error or for full setup
-      navigate("/student/quiz-generator");
+      navigate(`${basePath}/quiz-generator`);
     } finally {
       setLoading(false);
     }
@@ -105,7 +107,7 @@ const YourQuiz = () => {
           AI Quiz Generator
         </h1>
         <button
-          onClick={() => navigate("/student/quiz-generator")}
+          onClick={() => navigate(`${basePath}/quiz-generator`)}
           className="text-violet text-xs font-semibold font-display hover:underline flex items-center gap-1 cursor-pointer"
         >
           Open Generator <ArrowRight className="w-3.5 h-3.5" />
@@ -218,7 +220,7 @@ const YourQuiz = () => {
             {recentQuizzes.map((quiz) => (
               <div
                 key={quiz._id}
-                onClick={() => navigate("/student/quiz-generator")}
+                onClick={() => navigate(`${basePath}/quiz-generator`)}
                 className="flex justify-between items-center bg-white border border-line rounded-xl px-3.5 py-2.5 text-xs font-semibold text-ink hover:border-violet/40 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2 truncate">

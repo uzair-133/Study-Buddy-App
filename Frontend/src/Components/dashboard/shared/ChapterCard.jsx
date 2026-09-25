@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
 import api from '../../../api/axios'
 import { EllipsisVertical, Trash2, BookOpen } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const ChapterCard = ({ chapter, subjectId, onDelete }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleDelete = async (e) => {
     e.stopPropagation()
@@ -20,7 +21,8 @@ const ChapterCard = ({ chapter, subjectId, onDelete }) => {
   const handleCardClick = () => {
     const sId = subjectId || chapter.subjectId
     if (chapter?._id && sId) {
-      navigate(`/student/subjects/${sId}/chapters/${chapter._id}`)
+      const basePath = location.pathname.startsWith('/teacher') ? '/teacher' : '/student'
+      navigate(`${basePath}/subjects/${sId}/chapters/${chapter._id}`)
     }
   }
 
