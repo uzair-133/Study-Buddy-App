@@ -7,11 +7,6 @@ const chapterSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-   studentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
-    required: true
-},
 subjectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "subject",
