@@ -9,10 +9,11 @@ const subjectRoutes = require("./routes/subjectRoutes");
 const chapterRoutes = require("./routes/chapterRoutes");
 const cookieParser = require("cookie-parser");
 const materialRoutes = require('./routes/materialRoutes')
-const taskRoutes =  require('./routes/taskRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const quizRoutes = require('./routes/quizRoutes');
+const classRoutes = require('./routes/classRoutes')
 const cors = require("cors");
 const allowedOrigins = [
   "http://localhost:5173",
@@ -51,7 +52,7 @@ app.use("/api/subject", subjectRoutes);
 
 app.use("/api/chapter", chapterRoutes);
 
-app.use("/api/material",materialRoutes)
+app.use("/api/material", materialRoutes)
 
 app.use("/api/task", taskRoutes);
 
@@ -60,6 +61,8 @@ app.use("/api/user", userRoutes);
 app.use("/api/search", searchRoutes);
 
 app.use("/api/quiz", quizRoutes);
+
+app.use("/api/joined", classRoutes);
 
 
 module.exports = app;
