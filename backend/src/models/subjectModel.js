@@ -25,20 +25,17 @@ const subjectSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-subjectSchema.pre("validate", function (next) {
-  const isPersonal = this.studentId && !this.classId
-  const classSubject = this.teacherId && this.classId && !this.studentId
+subjectSchema.pre("validate", function () {
+  const isStudentPersonal = this.studentId && !this.teacherId && !this.classId;
+  const isTeacherPersonal = this.teacherId && !this.studentId && !this.classId;
+  const isClassSubject = this.teacherId && this.classId && !this.studentId;
 
-  if (!isPersonal && !classSubject) {
-    next(
-      new Error("Subject student ka personal ho,Ya class ka jo teacher nay create ki hai")
-    )
+  if (!isStudentPersonal && !isTeacherPersonal && !isClassSubject) {
+    throw new Error(
+      "Subject student ya teacher ka personal ho, ya class ka jo teacher ne create ki hai"
+    );
   }
-  else {
-    next()
-  }
-
-})
+});
 
 const subjectModal = mongoose.model("subject", subjectSchema);
 

@@ -25,18 +25,13 @@ const materialSchema = new mongoose.Schema({
     },
 }, { timestamps: true })
 
-materialSchema.pre("validate",function(next) {
-    const isStudent = this.studentId && !this.teacherId
-    const isTeacher = this.teacherId && !this.studentId
-    if(!isStudent && !isTeacher){
-        next(
-            new Error("teacher ya student id required hai")
-        )
+materialSchema.pre("validate", function() {
+    const isStudent = this.studentId && !this.teacherId;
+    const isTeacher = this.teacherId && !this.studentId;
+    if (!isStudent && !isTeacher) {
+        throw new Error("teacher ya student id required hai");
     }
-    else{
-        next()
-    }
-})
+});
 
 const materialModel = mongoose.model("material", materialSchema);
 

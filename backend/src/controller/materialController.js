@@ -19,11 +19,15 @@ const uploadMaterial = async (req, res) => {
 
         const result = await uploadFile(file.buffer.toString('base64'), file.originalname || fileName);
 
+        const userId = req.user.id || req.user._id;
+        const isTeacher = req.user.role === 'teacher';
+
         const material = await materialModal.create({
             fileName,
             fileUrl: result.url || result.fileUrl,
             category,
-            studentId: req.user.id,
+            studentId: isTeacher ? null : userId,
+            teacherId: isTeacher ? userId : null,
             chapterId,
             subjectId
         });
@@ -45,7 +49,10 @@ const uploadMaterial = async (req, res) => {
 const getMaterial = async (req, res) => {
     try {
         const { chapterId, subjectId, category } = req.query;
-        const filter = { studentId: req.user.id };
+        const userId = req.user.id || req.user._id;
+        const filter = {
+            $or: [{ studentId: userId }, { teacherId: userId }]
+        };
 
         if (chapterId) filter.chapterId = chapterId;
         if (subjectId) filter.subjectId = subjectId;
@@ -66,9 +73,10 @@ const getMaterial = async (req, res) => {
 const deleteMaterial = async (req, res) => {
     const { materialId } = req.params;
     try {
+        const userId = req.user.id || req.user._id;
         const material = await materialModal.findOneAndDelete({
             _id: materialId,
-            studentId: req.user.id
+            $or: [{ studentId: userId }, { teacherId: userId }]
         });
 
         if (!material) {

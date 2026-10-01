@@ -11,6 +11,16 @@ subjectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "subject",
     required: true
+},
+studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    default: null
+},
+teacherId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    default: null
 }
 },{timestamps:true});
 

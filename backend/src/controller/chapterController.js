@@ -22,10 +22,14 @@ const createChapter = async (req, res) => {
             });
         }
 
+        const userId = req.user.id || req.user._id;
+        const isTeacher = req.user.role === 'teacher';
+
         const chapter = await chapterModel.create({
-            title,
+            title: title.trim(),
             subjectId,
-            studentId: req.user.id
+            studentId: isTeacher ? null : userId,
+            teacherId: isTeacher ? userId : null,
         });
 
         res.status(201).json({
@@ -46,10 +50,13 @@ const createChapter = async (req, res) => {
 const getChapter = async (req, res) => {
     try {
         const subjectId = req.params.subjectId || req.query.subjectId || req.body.subjectId;
-        const filter = { studentId: req.user.id };
+        const userId = req.user.id || req.user._id;
 
+        const filter = {};
         if (subjectId) {
             filter.subjectId = subjectId;
+        } else {
+            filter.$or = [{ studentId: userId }, { teacherId: userId }];
         }
 
         const chapter = await chapterModel.find(filter).sort({ createdAt: -1 });
@@ -71,9 +78,10 @@ const getChapter = async (req, res) => {
 const deleteChapter = async (req, res) => {
     try {
         const { chapterId } = req.params;
+        const userId = req.user.id || req.user._id;
         const chapter = await chapterModel.findOne({
             _id: chapterId,
-            studentId: req.user.id  
+            $or: [{ studentId: userId }, { teacherId: userId }]
         });
 
         if (!chapter) {
