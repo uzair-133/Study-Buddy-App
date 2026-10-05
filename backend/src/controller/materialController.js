@@ -50,13 +50,17 @@ const getMaterial = async (req, res) => {
     try {
         const { chapterId, subjectId, category } = req.query;
         const userId = req.user.id || req.user._id;
-        const filter = {
-            $or: [{ studentId: userId }, { teacherId: userId }]
-        };
+
+        const filter = {};
 
         if (chapterId) filter.chapterId = chapterId;
         if (subjectId) filter.subjectId = subjectId;
         if (category) filter.category = category;
+
+        // Agar specific chapter ya subject query me nahi hai, to sirf user ke apne materials dikhayein
+        if (!chapterId && !subjectId) {
+            filter.$or = [{ studentId: userId }, { teacherId: userId }];
+        }
 
         const materials = await materialModal.find(filter).sort({ createdAt: -1 });
         res.status(200).json(materials);

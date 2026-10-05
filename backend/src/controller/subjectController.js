@@ -1,4 +1,5 @@
 const subjectModal = require("../models/subjectModel");
+const classMemberShipModel = require("../models/classMembershipModel");
 
 // Create Subject Controller
 const createSubject = async (req, res) => {
@@ -34,10 +35,34 @@ const getSubject = async (req, res) => {
   try {
     const userId = req.user.id || req.user._id;
     const isTeacher = req.user.role === "teacher";
+    const { classId } = req.query;
 
-    const filter = isTeacher
-      ? { $or: [{ teacherId: userId }, { studentId: userId }] }
-      : { studentId: userId };
+    let filter = {};
+
+    if (classId) {
+      if (isTeacher) {
+        filter = { classId, teacherId: userId };
+      } else {
+        // Student ke liye check karein ke student ne class join ki hui hai
+        const isMember = await classMemberShipModel.findOne({
+          studentId: userId,
+          classId,
+        });
+
+        if (!isMember) {
+          return res.status(403).json({
+            message: "Aap is class ke member nahi hain",
+          });
+        }
+
+        filter = { classId };
+      }
+    } else {
+      // Agar classId na ho to sirf personal subjects
+      filter = isTeacher
+        ? { teacherId: userId, classId: null }
+        : { studentId: userId, classId: null };
+    }
 
     const subject = await subjectModal
       .find(filter)
