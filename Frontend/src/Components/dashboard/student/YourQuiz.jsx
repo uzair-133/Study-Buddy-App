@@ -87,13 +87,26 @@ const YourQuiz = () => {
         questionCount: Number(questionCount) || 10,
       });
 
-      if (res.data?.success) {
-        navigate(`${basePath}/quiz-generator`);
+      if (res.data?.success && res.data?.quiz) {
+        navigate(`${basePath}/quiz-generator`, {
+          state: { initialQuiz: res.data.quiz },
+        });
       }
     } catch (err) {
       console.error("Error generating quiz from dashboard widget:", err);
-      // Navigate to generator page if error or for full setup
-      navigate(`${basePath}/quiz-generator`);
+      navigate(`${basePath}/quiz-generator`, {
+        state: {
+          preselectedSubject: selectedSubject,
+          preselectedChapter: selectedChapter,
+          preselectedDifficulty: difficulty,
+          preselectedMode: mode,
+          preselectedCount: questionCount,
+          error:
+            err.response?.data?.message ||
+            err.message ||
+            "Failed to generate quiz from dashboard. Please try again.",
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -107,7 +120,17 @@ const YourQuiz = () => {
           AI Quiz Generator
         </h1>
         <button
-          onClick={() => navigate(`${basePath}/quiz-generator`)}
+          onClick={() =>
+            navigate(`${basePath}/quiz-generator`, {
+              state: {
+                preselectedSubject: selectedSubject,
+                preselectedChapter: selectedChapter,
+                preselectedDifficulty: difficulty,
+                preselectedMode: mode,
+                preselectedCount: questionCount,
+              },
+            })
+          }
           className="text-violet text-xs font-semibold font-display hover:underline flex items-center gap-1 cursor-pointer"
         >
           Open Generator <ArrowRight className="w-3.5 h-3.5" />
@@ -220,7 +243,11 @@ const YourQuiz = () => {
             {recentQuizzes.map((quiz) => (
               <div
                 key={quiz._id}
-                onClick={() => navigate(`${basePath}/quiz-generator`)}
+                onClick={() =>
+                  navigate(`${basePath}/quiz-generator`, {
+                    state: { openQuizId: quiz._id },
+                  })
+                }
                 className="flex justify-between items-center bg-white border border-line rounded-xl px-3.5 py-2.5 text-xs font-semibold text-ink hover:border-violet/40 transition-all cursor-pointer"
               >
                 <div className="flex items-center gap-2 truncate">

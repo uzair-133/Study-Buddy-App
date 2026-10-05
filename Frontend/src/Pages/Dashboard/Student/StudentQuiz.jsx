@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import api from "../../../api/axios";
 import { Sparkles, XCircle, X } from "lucide-react";
 import QuizSetup from "../../../Components/dashboard/student/QuizSetup";
@@ -6,6 +7,8 @@ import ActiveQuiz from "../../../Components/dashboard/student/ActiveQuiz";
 import HistoryQuiz from "../../../Components/dashboard/student/HistoryQuiz";
 
 const StudentQuiz = () => {
+  const location = useLocation();
+
   // Navigation & View states: 'setup' | 'quiz' | 'history'
   const [activeTab, setActiveTab] = useState("setup");
 
@@ -130,23 +133,7 @@ const StudentQuiz = () => {
       });
 
       if (res.data?.success && res.data?.quiz) {
-        const generatedQuiz = res.data.quiz;
-        setCurrentQuiz(generatedQuiz);
-        setUserAnswers({});
-        setCurrentQuestionIdx(0);
-        setSubmittedResult(null);
-
-        // Initialize Chat assistant greeting if in question mode
-        if (generatedQuiz.mode === "question") {
-          setChatMessages([
-            {
-              sender: "ai",
-              text: `Hello! I am your AI Study Assistant. Here are your ${generatedQuiz.questions.length} generated questions. Click "💡 Get Answer" on any question or ask me anything in the chat below!`
-            }
-          ]);
-        }
-
-        setActiveTab("quiz");
+        handleOpenFreshQuiz(res.data.quiz);
         fetchQuizHistory();
       } else {
         setError("Failed to generate quiz. Please try again.");
@@ -257,6 +244,25 @@ const StudentQuiz = () => {
     }
   };
 
+  // Open fresh quiz (from generate or dashboard state)
+  const handleOpenFreshQuiz = (quiz) => {
+    setCurrentQuiz(quiz);
+    setUserAnswers({});
+    setCurrentQuestionIdx(0);
+    setSubmittedResult(null);
+
+    if (quiz.mode === "question") {
+      setChatMessages([
+        {
+          sender: "ai",
+          text: `Hello! I am your AI Study Assistant. Here are your ${quiz.questions?.length || 0} generated questions. Click "💡 Get Answer" on any question or ask me anything in the chat below!`
+        }
+      ]);
+    }
+
+    setActiveTab("quiz");
+  };
+
   // View Saved Quiz from History
   const handleViewSavedQuiz = (quiz) => {
     setCurrentQuiz(quiz);
@@ -270,7 +276,7 @@ const StudentQuiz = () => {
         quiz
       });
       const preFilled = {};
-      quiz.questions.forEach((q, idx) => {
+      quiz.questions?.forEach((q, idx) => {
         if (q.userAnswer) preFilled[idx] = q.userAnswer;
       });
       setUserAnswers(preFilled);
@@ -289,6 +295,46 @@ const StudentQuiz = () => {
 
     setActiveTab("quiz");
   };
+
+  // Listen to navigation state from Dashboard Quiz Generator widget
+  useEffect(() => {
+    if (!location.state) return;
+
+    if (location.state.initialQuiz) {
+      handleOpenFreshQuiz(location.state.initialQuiz);
+    } else if (location.state.openQuizId) {
+      const fetchAndOpenQuiz = async () => {
+        try {
+          const res = await api.get(`/api/quiz/${location.state.openQuizId}`);
+          if (res.data?.success && res.data?.quiz) {
+            handleViewSavedQuiz(res.data.quiz);
+          }
+        } catch (err) {
+          console.error("Failed to load quiz from state ID:", err);
+        }
+      };
+      fetchAndOpenQuiz();
+    }
+
+    if (location.state.preselectedSubject) {
+      setSelectedSubject(location.state.preselectedSubject);
+    }
+    if (location.state.preselectedChapter) {
+      setSelectedChapter(location.state.preselectedChapter);
+    }
+    if (location.state.preselectedDifficulty) {
+      setDifficulty(location.state.preselectedDifficulty);
+    }
+    if (location.state.preselectedMode) {
+      setMode(location.state.preselectedMode);
+    }
+    if (location.state.preselectedCount) {
+      setQuestionCount(location.state.preselectedCount);
+    }
+    if (location.state.error) {
+      setError(location.state.error);
+    }
+  }, [location.state]);
 
   return (
     <section className="p-6 lg:p-10 font-sans text-ink bg-white min-h-screen">

@@ -38,7 +38,10 @@ const QuizSetup = ({
               <label className="block text-xs font-sans text-ink-soft mb-1">Subject</label>
               <select
                 value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
+                onChange={(e) => {
+                  setSelectedSubject(e.target.value);
+                  setSelectedChapter("");
+                }}
                 className="w-full px-4 py-3 rounded-xl border border-line bg-white text-ink text-xs sm:text-sm font-sans focus:outline-none focus:ring-2 focus:ring-violet/40 focus:border-violet"
               >
                 <option value="">-- Choose Subject (Optional) --</option>
