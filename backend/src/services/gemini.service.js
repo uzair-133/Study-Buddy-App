@@ -1,7 +1,15 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const FALLBACK_MODELS = [process.env.GEMINI_MODEL, "gemini-3.8-flash", "gemini-3.7-flash"].filter(Boolean);
+
+// Fast & stable Google models with fallbacks for high demand (503) spikes
+const FALLBACK_MODELS = [
+  process.env.GEMINI_MODEL,
+  "gemini-3.5-flash-lite",
+  "gemini-flash-lite-latest",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+].filter(Boolean);
 
 // 1. Generate Quiz Content (MCQs ya Questions Only)
 const generateQuizContent = async ({
@@ -76,9 +84,25 @@ Rules:
 
       // Clean & parse JSON
       const cleanJson = text.replace(/```json/g, "").replace(/```/g, "").trim();
-      return JSON.parse(cleanJson);
+      const rawData = JSON.parse(cleanJson);
+
+      // Normalize correctAnswer
+      const normalizedData = Array.isArray(rawData)
+        ? rawData.map((item) => ({
+            ...item,
+            correctAnswer: item.correctAnswer || item.answer || "",
+          }))
+        : [];
+
+      if (normalizedData.length > 0) {
+        return normalizedData;
+      }
     } catch (err) {
       lastError = err;
+      // Agar temporary 503 high demand spike ho to thoda wait karke next model try karein
+      if (err.message?.includes("503") || err.status === 503) {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+      }
     }
   }
 

@@ -34,13 +34,33 @@ const generateQuiz = async (req, res) => {
       if (chapter) chapterName = chapter.title;
     }
 
-    // 2. Direct File upload check (PDF / Document)
+    // 2. Direct File upload check (agar user ne naya file upload kiya ho)
     const uploadedFile = req.file || (req.files && req.files[0]);
-    const fileBuffer = uploadedFile ? uploadedFile.buffer : null;
-    const mimeType = uploadedFile ? uploadedFile.mimetype : null;
+    let fileBuffer = uploadedFile ? uploadedFile.buffer : null;
+    let mimeType = uploadedFile ? uploadedFile.mimetype : null;
     if (uploadedFile && !chapterName) chapterName = uploadedFile.originalname;
 
-    // 3. Fallback text content agar na ho
+    // 3. Agar direct file upload na ho to Chapter ki saved PDF ImageKit se fetch karein
+    if (!fileBuffer && chapterId) {
+      try {
+        const chapterMaterial = await materialModel
+          .findOne({ chapterId })
+          .sort({ createdAt: -1 });
+
+        if (chapterMaterial && chapterMaterial.fileUrl) {
+          const fileRes = await fetch(chapterMaterial.fileUrl);
+          if (fileRes.ok) {
+            const arrayBuf = await fileRes.arrayBuffer();
+            fileBuffer = Buffer.from(arrayBuf);
+            mimeType = fileRes.headers.get("content-type") || "application/pdf";
+          }
+        }
+      } catch (fetchErr) {
+        console.warn("Chapter material fetch warning:", fetchErr.message);
+      }
+    }
+
+    // 4. Fallback text content agar file na milay
     const textContent =
       content ||
       `Generate a quiz about ${subjectName || "General Topic"} ${
