@@ -39,15 +39,15 @@ params: { subjectId: _id },
   }
   return (
     <>
-      <section onClick={handleClick}>
-        <div className='bg-white border border-gray-300 rounded-2xl pl-6 hover:-translate-y-1 transition ease-in'>
+      <section onClick={handleClick} className="cursor-pointer">
+        <div className='bg-white border border-gray-300 rounded-2xl pl-6 hover:-translate-y-1 transition ease-in cursor-pointer'>
           <h1 className='font-semibold font-display pt-3'>{title}</h1>
           <div className='flex text-ink-soft text-sm pt-1 space-x-1'>
             <p>Chapter:{chapter}</p>
             <p>Files:{file}</p>
           </div>
           <p className={`inline-block mt-2 mb-2 px-3 py-1 text-sm rounded-2xl w-fit font-semibold font-sans ${type === "joined" ? "bg-coral/10 text-coral" : "bg-violet/10 text-violet"
-            }`}>{type === "joined" ? " Joined Class" : "My Subject"}</p>
+            }`}>{type === "joined" ? (location.pathname.startsWith('/teacher') ? "Class Subject" : "Joined Class") : "My Subject"}</p>
         </div>
       </section>
     </>

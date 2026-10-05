@@ -18,59 +18,37 @@ const generateQuiz = async (req, res) => {
       difficulty = "medium",
       mode = "mcq",
       questionCount = 10,
-      content,
+      content = "",
     } = req.body;
 
     let subjectName = "";
     let chapterName = "";
-    let textContent = content || "";
 
-    // Handle direct PDF/document file upload if provided
-    const uploadedFile = req.file || (req.files && req.files[0]);
-    let fileBuffer = null;
-    let mimeType = null;
-
-    if (uploadedFile) {
-      fileBuffer = uploadedFile.buffer;
-      mimeType = uploadedFile.mimetype || "application/pdf";
-      if (!chapterName) chapterName = uploadedFile.originalname;
-    }
-
-    // Fetch Subject details if subjectId is provided
+    // 1. Agar Subject / Chapter pass kiye hon to unke names layein
     if (subjectId) {
       const subject = await subjectModel.findById(subjectId);
-      if (subject) {
-        subjectName = subject.title;
-      }
+      if (subject) subjectName = subject.title;
     }
-
-    // Fetch Chapter details if chapterId is provided
     if (chapterId) {
       const chapter = await chapterModel.findById(chapterId);
-      if (chapter) {
-        chapterName = chapter.title;
-      }
+      if (chapter) chapterName = chapter.title;
     }
 
-    // If no file and no explicit content text provided, check if materials exist for this chapter/subject
-    if (!fileBuffer && !textContent && chapterId) {
-      const materials = await materialModel.find({ chapterId });
-      if (materials.length > 0) {
-        textContent = materials
-          .map((m) => `Material: ${m.fileName} (${m.category})`)
-          .join("\n");
-      }
-    }
+    // 2. Direct File upload check (PDF / Document)
+    const uploadedFile = req.file || (req.files && req.files[0]);
+    const fileBuffer = uploadedFile ? uploadedFile.buffer : null;
+    const mimeType = uploadedFile ? uploadedFile.mimetype : null;
+    if (uploadedFile && !chapterName) chapterName = uploadedFile.originalname;
 
-    // Fallback text if still empty
-    if (!fileBuffer && !textContent) {
-      textContent = `Generate a quiz for ${subjectName || "Subject"} ${
-        chapterName ? "- Chapter: " + chapterName : ""
-      }. Focus on core concepts and key learning outcomes.`;
-    }
+    // 3. Fallback text content agar na ho
+    const textContent =
+      content ||
+      `Generate a quiz about ${subjectName || "General Topic"} ${
+        chapterName ? "- " + chapterName : ""
+      }. Focus on core concepts.`;
 
-    // Call Gemini AI service with single unified function (supports direct PDF inlineData)
-    const rawQuestions = await geminiService.generateQuizContent({
+    // 4. Gemini AI se quiz generate karein
+    const questions = await geminiService.generateQuizContent({
       textContent,
       fileBuffer,
       mimeType,
@@ -81,42 +59,32 @@ const generateQuiz = async (req, res) => {
       chapterName,
     });
 
-    // Format questions for saving
-    const formattedQuestions = rawQuestions.map((q) => ({
-      question: q.question,
-      options: Array.isArray(q.options) ? q.options : [],
-      correctAnswer: q.correctAnswer || "",
-      userAnswer: null,
-      isCorrect: null,
-    }));
-
-    // Create & save Quiz history record
+    // 5. Database me quiz record save karein
     const quiz = await quizModel.create({
       studentId,
       subjectId: subjectId || null,
       chapterId: chapterId || null,
       subjectName: subjectName || "General",
-      chapterName:
-        chapterName || (uploadedFile ? uploadedFile.originalname : "General"),
+      chapterName: chapterName || (uploadedFile ? uploadedFile.originalname : "General"),
       difficulty: String(difficulty).toLowerCase(),
       mode: String(mode).toLowerCase(),
-      questionCount: formattedQuestions.length,
-      questions: formattedQuestions,
+      questionCount: questions.length,
+      questions,
       score: 0,
-      totalQuestions: formattedQuestions.length,
+      totalQuestions: questions.length,
       status: "generated",
     });
 
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: "Quiz generated successfully",
       quiz,
     });
   } catch (error) {
-    console.error("Error in generateQuiz controller:", error);
-    return res.status(500).json({
+    console.error("Generate Quiz Error:", error);
+    res.status(500).json({
       success: false,
-      message: error.message || "Internal server error while generating quiz",
+      message: error.message || "Failed to generate quiz",
     });
   }
 };

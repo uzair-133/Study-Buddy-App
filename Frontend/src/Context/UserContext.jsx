@@ -8,8 +8,8 @@ const UserProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchUser = async () => {
-        setLoading(true);
+    const fetchUser = async (showLoading = false) => {
+        if (showLoading) setLoading(true);
         try {
             const res = await api.get('/api/auth/me', { withCredentials: true });
             setUser(res.data?.user || null);
@@ -18,12 +18,12 @@ const UserProvider = ({ children }) => {
             setUser(null);
             setError(err.response?.data?.message || 'Failed to fetch user data');
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchUser();
+        fetchUser(true);
     }, []);
 
     return (

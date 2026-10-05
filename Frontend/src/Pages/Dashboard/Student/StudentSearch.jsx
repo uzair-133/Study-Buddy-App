@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import api from "../../../api/axios";
 import {
   Search, X, BookOpen, Folder, FileText, PenTool, Presentation, Star, ArrowRight, ExternalLink, Sparkles, SearchX, Loader2, FolderOpen,
@@ -7,10 +7,12 @@ import {
 import { openFileViewer } from "../../../utils/fileViewer";
 
 const StudentSearch = () => {
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || searchParams.get("keyword") || "";
   const [category, setCategory] = useState("all");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState(initialQuery);
   const [searchData, setSearchData] = useState({
     subject: [],
     chapter: [],

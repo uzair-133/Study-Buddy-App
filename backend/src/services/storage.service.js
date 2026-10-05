@@ -5,7 +5,7 @@ const client = new ImageKit({
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
 });
 
-const uploadFile = async (file, originalName = 'studyMaterialFile') => {
+const uploadFile = async (file, originalName = 'studyMaterialFile', folder = '/studyBuddy/files') => {
     const ext = path.extname(originalName) || '';
     const baseName = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '_');
     const safeFileName = `${baseName}_${Date.now()}${ext}`;
@@ -14,7 +14,7 @@ const uploadFile = async (file, originalName = 'studyMaterialFile') => {
         file,
         fileName: safeFileName,
         useUniqueFileName: true,
-        folder: "/00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000studyBuddyFolder/files"
+        folder: folder
     });
     return result;
 }

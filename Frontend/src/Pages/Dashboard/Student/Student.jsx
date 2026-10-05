@@ -17,16 +17,24 @@ const Student = () => {
         const subjectRes = await api.get("/api/subject/getSubject", {
           withCredentials: true,
         });
+        const joinedRes = await api.get("/api/class/getJoinedClass", {
+          withCredentials: true,
+        });
         const materialRes = await api.get("/api/material/materials", {
           withCredentials: true,
         });
-        setStats((prev) => ({
-          ...prev,
-          subjects: subjectRes.data.subject.length,
-          filesUploaded: materialRes.data.length,
-        }));
+        const quizRes = await api.get("/api/quiz/history", {
+          withCredentials: true,
+        });
+
+        setStats({
+          subjects: subjectRes.data.subject?.length || 0,
+          joinedClasses: joinedRes.data.data?.length || joinedRes.data.count || 0,
+          filesUploaded: materialRes.data?.length || 0,
+          quizzesTaken: quizRes.data.quizzes?.length || quizRes.data.count || 0,
+        });
       } catch (err) {
-        console.log(err);
+        console.log("Stats fetch error:", err);
       }
     };
     fetchStats();

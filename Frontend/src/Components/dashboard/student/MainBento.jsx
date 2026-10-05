@@ -14,7 +14,8 @@ const MainBento = () => {
   const [loading, setLoading] = useState(true)
    const getSubject = async () => {
     try {
-      const res = await api.get('/api/subject/getSubject', { withCredentials: true })
+      setLoading(true)
+      const res = await api.get('/api/subject/getSubject?dashboard=true', { withCredentials: true })
       setSubject(res.data.subject || []);
       setError('')
     }
@@ -41,11 +42,23 @@ const MainBento = () => {
             View all
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-2 xs:grid xs:grid-cols-2 sm:grid sm:grid-cols-2  md:grid md:grid-cols-3 md:gap-3 lg:grid lg:grid-cols-2">
-          {subjects.map((e, index) => {
-            return <YourSubject key={index} {...e} />;
-          })}
-        </div>
+
+        {loading ? (
+          <p className="text-sm text-ink-soft">Loading subjects...</p>
+        ) : error ? (
+          <p className="text-sm text-coral">{error}</p>
+        ) : subjects.length > 0 ? (
+          <div className="grid grid-cols-1 gap-2 xs:grid xs:grid-cols-2 sm:grid sm:grid-cols-2 md:grid md:grid-cols-3 md:gap-3 lg:grid lg:grid-cols-2">
+            {subjects.map((e, index) => {
+              return <YourSubject key={e._id || index} {...e} />;
+            })}
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center text-sm text-ink-soft">
+            No subjects added yet. Create your first subject or join a class!
+          </div>
+        )}
+
         <YourQuiz />
       </div>
       <div className="">

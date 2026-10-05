@@ -1,20 +1,28 @@
 const userModel = require("../models/userModel");
 const { uploadFile } = require("../services/storage.service");
 
+// 1. Profile Picture Update Controller
 const updateProfile = async (req, res) => {
   try {
-    const file = req.file || (req.files && req.files[0]);
+    const file = req.file;
     if (!file) {
-      return res.status(400).json({ message: "File is required" });
+      return res.status(400).json({ message: "Please select an image file" });
     }
 
-    const result = await uploadFile(file.buffer.toString("base64"), file.originalname || "avatar.jpg");
+    // File ko ImageKit par upload karein
+    const result = await uploadFile(
+      file.buffer.toString("base64"),
+      file.originalname || "avatar.jpg",
+      "/studyBuddy/avatars"
+    );
 
+    // Database me user ka profile image update karein
+    const userId = req.user.id || req.user._id;
     const updatedUser = await userModel
       .findByIdAndUpdate(
-        req.user.id,
-        { profileImage: result.url || result.fileUrl },
-        { returnDocument: 'after' }
+        userId,
+        { profileImage: result.url },
+        { returnDocument: "after" }
       )
       .select("-password");
 
@@ -23,53 +31,52 @@ const updateProfile = async (req, res) => {
       user: updatedUser,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "internal server error" });
+    console.error("Update Profile Error:", err);
+    res.status(500).json({ message: "Failed to update profile", error: err.message });
   }
 };
 
+// 2. Delete User Controller
 const deleteUser = async (req, res) => {
-  const userId = req.params.id;
-
   try {
-    const deletedUser = await userModel.findByIdAndDelete(userId);
-    res
-      .status(200)
-      .json({ message: "User deleted successfully", user: deletedUser });
+    const deletedUser = await userModel.findByIdAndDelete(req.params.id);
+    res.status(200).json({
+      message: "User deleted successfully",
+      user: deletedUser,
+    });
   } catch (err) {
-    console.log(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+// 3. Update Name Controller
 const updateName = async (req, res) => {
   try {
     const { name } = req.body;
     if (!name) {
       return res.status(400).json({ message: "Name is required" });
     }
+
+    // Check karein ke is naam ka koi aur user to nahi
     const nameExist = await userModel.findOne({
       name,
       _id: { $ne: req.user.id },
     });
     if (nameExist) {
-      return res.status(400).json({
-        message: "User Already Exist By This Name",
-      });
+      return res.status(400).json({ message: "User already exists with this name" });
     }
 
-    const updateN = await userModel
-      .findByIdAndUpdate(req.user.id, { name }, { returnDocument: 'after' })
+    // Name update karein
+    const updatedUser = await userModel
+      .findByIdAndUpdate(req.user.id, { name }, { returnDocument: "after" })
       .select("-password");
+
     res.status(200).json({
-      message: "Name Updated Successfully",
-      user: updateN,
+      message: "Name updated successfully",
+      user: updatedUser,
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Internal server Error",
-    });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

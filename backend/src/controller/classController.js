@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const classModel = require("../models/classModel");
 const classMemberShipModel = require("../models/classMembershipModel");
 const { generateJoinCode } = require("../utils/generateJoinCode");
@@ -213,11 +214,19 @@ const deleteClass = async (req, res) => {
 const getClassById = async (req, res) => {
   try {
     const { classId } = req.params;
-    const targetedClass = await classModel.findById(classId);
+    if (!mongoose.Types.ObjectId.isValid(classId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Class ID",
+      });
+    }
+    const targetedClass = await classModel.findById(classId).populate("teacherId", "name email");
     if (!targetedClass) {
       return res.status(404).json({
         success: false,
         message: "Class not found",
+
+        
       });
     }
     return res.status(200).json({
