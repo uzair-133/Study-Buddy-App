@@ -8,12 +8,15 @@ const {
   getJoinedClass,
   leaveClass,
   deleteClass,
+  getClassById,
 } = require("../controller/classController");
 
 router.post("/createClass", authMiddleware.authTeacher, createClass);
 router.post("/classJoin", authMiddleware.authStudent, joinClass);
 router.get("/getMyClass", authMiddleware.authTeacher, getMyClass);
 router.get("/getJoinedClass", authMiddleware.authStudent, getJoinedClass);
+// Single class detail (both teacher and student can access)
+router.get("/:classId", authMiddleware.authStudent, getClassById);
 // Student class leave karega
 router.delete("/leaveClass/:classId", authMiddleware.authStudent, leaveClass);
 // Teacher apni class delete karega

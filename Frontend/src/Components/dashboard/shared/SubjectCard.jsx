@@ -65,31 +65,33 @@ const SubjectCard = ({ subject, onDelete }) => {
           {subject.title}
         </h3>
 
-        <div className="relative" onClick={(e) => e.stopPropagation()}>
-          <EllipsisVertical
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            size={20}
-            className="text-gray-400 hover:text-gray-600 cursor-pointer p-1 rounded-full hover:bg-gray-100"
-          />
+        {onDelete && (
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
+            <EllipsisVertical
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              size={20}
+              className="text-gray-400 hover:text-gray-600 cursor-pointer p-1 rounded-full hover:bg-gray-100"
+            />
 
-          {isMenuOpen && (
-            <div className="absolute right-0 top-7 bg-white border border-line rounded-lg shadow-lg z-10 w-32 py-1">
-              <button
-                onClick={handleDelete}
-                className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-coral hover:bg-paper rounded-lg"
-              >
-                <Trash2 size={14} /> Delete
-              </button>
-            </div>
-          )}
-        </div>
+            {isMenuOpen && (
+              <div className="absolute right-0 top-7 bg-white border border-line rounded-lg shadow-lg z-10 w-32 py-1">
+                <button
+                  onClick={handleDelete}
+                  className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-coral hover:bg-paper rounded-lg"
+                >
+                  <Trash2 size={14} /> Delete
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <p className="text-sm text-ink-soft mt-1">
         {chapterCount} chapters · {fileCount} files
       </p>
       <span className="inline-block mt-2 text-xs font-bold px-3 py-1 rounded-full bg-violet/10 text-violet">
-        My Subject
+        {subject.classId ? "Class Subject" : "My Subject"}
       </span>
     </div>
   );

@@ -15,17 +15,33 @@ import AddChapterModal from "../../../Components/dashboard/shared/AddChapterModa
 import { useState, useEffect } from "react"
 import api from "../../../api/axios"
 import { useParams, Link } from "react-router-dom"
+import { ArrowLeft } from "lucide-react"
 
 const TeacherSubjectDetail = () => {
   const { subjectId } = useParams()
+  const [subjectInfo, setSubjectInfo] = useState(null)
   const [chapters, setChapters] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchChapter = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true)
+        setError('')
+
+        // 1. Fetch Subject Info (to know classId and title)
+        try {
+          const subRes = await api.get(`/api/subject/${subjectId}`, { withCredentials: true })
+          if (subRes.data.subject) {
+            setSubjectInfo(subRes.data.subject)
+          }
+        } catch (e) {
+          console.log("Could not fetch subject info:", e)
+        }
+
+        // 2. Fetch Chapters for this subject
         const res = await api.get(`/api/chapter/getchapter/${subjectId}`, { withCredentials: true })
         setChapters(res.data.chapter || [])
       } catch (err) {
@@ -34,8 +50,9 @@ const TeacherSubjectDetail = () => {
         setLoading(false)
       }
     }
+
     if (subjectId) {
-      fetchChapter()
+      fetchData()
     }
   }, [subjectId])
 
@@ -48,16 +65,28 @@ const TeacherSubjectDetail = () => {
     setChapters(prevChapter => prevChapter.filter(chap => chap._id !== deletedId))
   }
 
+  // Explicit back destination (never loop with history)
+  const backDestination = subjectInfo?.classId
+    ? `/teacher/classes/${subjectInfo.classId}`
+    : "/teacher/subjects"
+
+  const backLabel = subjectInfo?.classId ? "Back to Class" : "Back to Subjects"
+
   return (
     <>
       <section className="p-8 lg:p-12">
-        <Link to="/teacher/subjects" className="text-sm font-semibold text-violet hover:underline mb-4 inline-block">
-          &larr; Back to Subjects
+        <Link
+          to={backDestination}
+          className="text-sm font-semibold text-violet hover:underline mb-4 inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft size={16} /> {backLabel}
         </Link>
 
         <div className="flex flex-col space-y-4 md:flex md:flex-row md:justify-between md:items-center md:space-y-0">
           <div>
-            <h1 className="font-semibold font-display text-xl md:text-2xl">My Chapters</h1>
+            <h1 className="font-semibold font-display text-xl md:text-2xl text-ink">
+              {subjectInfo ? `${subjectInfo.title} - Chapters` : "My Chapters"}
+            </h1>
             <p className="font-sans text-sm text-ink-soft">
               Chapters you've created and organized for this subject.
             </p>

@@ -122,7 +122,10 @@ const getJoinedClass = async (req, res) => {
     }
     const allJoined = await classMemberShipModel
       .find({ studentId })
-      .populate("classId")
+      .populate({
+        path: "classId",
+        populate: { path: "teacherId", select: "name email profileImage" },
+      })
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -206,6 +209,31 @@ const deleteClass = async (req, res) => {
   }
 };
 
+// Get Single Class by ID
+const getClassById = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const targetedClass = await classModel.findById(classId);
+    if (!targetedClass) {
+      return res.status(404).json({
+        success: false,
+        message: "Class not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: targetedClass,
+    });
+  } catch (error) {
+    console.error("Get Class By Id Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createClass,
   joinClass,
@@ -213,4 +241,5 @@ module.exports = {
   getJoinedClass,
   leaveClass,
   deleteClass,
+  getClassById,
 };

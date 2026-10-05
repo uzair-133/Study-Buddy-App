@@ -52,6 +52,7 @@ const StudentChapterDetail = () => {
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('lecture');
+  const [isClassSubject, setIsClassSubject] = useState(false);
 
   useEffect(() => {
     fetchChapterAndMaterials();
@@ -61,8 +62,18 @@ const StudentChapterDetail = () => {
     setLoading(true);
     setError('');
     try {
-      // 1. Fetch chapter details to get title
+      // 1. Fetch subject details to check if it belongs to a class
       if (subjectId) {
+        try {
+          const subRes = await api.get(`/api/subject/${subjectId}`, { withCredentials: true });
+          if (subRes.data.subject?.classId) {
+            setIsClassSubject(true);
+          }
+        } catch (e) {
+          console.log("Could not check class subject:", e);
+        }
+
+        // 2. Fetch chapter details to get title
         const chapRes = await api.get(`/api/chapter/getchapter/${subjectId}`, { withCredentials: true });
         const allChapters = chapRes.data.chapter || [];
         const currentChap = allChapters.find((c) => c._id === chapterId);
@@ -71,7 +82,7 @@ const StudentChapterDetail = () => {
         }
       }
 
-      // 2. Fetch materials for this chapter
+      // 3. Fetch materials for this chapter
       const matRes = await api.get('/api/material/materials', {
         params: { chapterId },
         withCredentials: true,
@@ -125,12 +136,14 @@ const StudentChapterDetail = () => {
             </p>
           </div>
 
-          <button
-            onClick={() => handleOpenUploadModal('lecture')}
-            className="px-4 py-2.5 rounded-xl bg-violet text-white font-sans font-semibold text-xs hover:bg-violet/90 transition-colors flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
-          >
-            <Plus size={16} /> Upload Material
-          </button>
+          {!isClassSubject && (
+            <button
+              onClick={() => handleOpenUploadModal('lecture')}
+              className="px-4 py-2.5 rounded-xl bg-violet text-white font-sans font-semibold text-xs hover:bg-violet/90 transition-colors flex items-center gap-2 shadow-sm shrink-0 cursor-pointer"
+            >
+              <Plus size={16} /> Upload Material
+            </button>
+          )}
         </div>
       </div>
 
@@ -185,13 +198,15 @@ const StudentChapterDetail = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleOpenUploadModal(cat.id)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-line text-ink hover:border-violet hover:text-violet transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
-                  >
-                    <Plus size={14} />
-                    <span>Upload</span>
-                  </button>
+                  {!isClassSubject && (
+                    <button
+                      onClick={() => handleOpenUploadModal(cat.id)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-line text-ink hover:border-violet hover:text-violet transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
+                    >
+                      <Plus size={14} />
+                      <span>Upload</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Category Material Files Grid */}
@@ -201,7 +216,7 @@ const StudentChapterDetail = () => {
                       <MaterialFile
                         key={mat._id}
                         material={mat}
-                        onDelete={handleMaterialDeleted}
+                        onDelete={isClassSubject ? null : handleMaterialDeleted}
                       />
                     ))}
                   </div>
@@ -211,12 +226,14 @@ const StudentChapterDetail = () => {
                     <p className="text-xs text-ink-soft">
                       No files uploaded in <span className="font-semibold text-ink">{cat.title}</span> yet.
                     </p>
-                    <button
-                      onClick={() => handleOpenUploadModal(cat.id)}
-                      className="mt-1 px-3 py-1 text-xs font-semibold rounded-lg bg-violet/10 text-violet hover:bg-violet hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
-                    >
-                      <Plus size={12} /> Add First File
-                    </button>
+                    {!isClassSubject && (
+                      <button
+                        onClick={() => handleOpenUploadModal(cat.id)}
+                        className="mt-1 px-3 py-1 text-xs font-semibold rounded-lg bg-violet/10 text-violet hover:bg-violet hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus size={12} /> Add First File
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -226,7 +243,7 @@ const StudentChapterDetail = () => {
       )}
 
       {/* Upload Modal Component */}
-      {isModalOpen && (
+      {!isClassSubject && isModalOpen && (
         <UploadMaterialModal
           chapterId={chapterId}
           subjectId={subjectId}

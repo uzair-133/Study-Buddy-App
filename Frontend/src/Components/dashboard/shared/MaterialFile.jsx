@@ -73,15 +73,17 @@ const MaterialFile = ({ material, onDelete }) => {
           <span>View</span>
         </button>
 
-        <button
-          onClick={handleDelete}
-          disabled={deleting}
-          className="flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-xs font-semibold bg-coral/10 text-coral hover:bg-coral hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
-          title="Delete Material"
-        >
-          {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-          <span>{deleting ? 'Deleting...' : 'Delete'}</span>
-        </button>
+        {onDelete && (
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-xs font-semibold bg-coral/10 text-coral hover:bg-coral hover:text-white transition-colors disabled:opacity-50 cursor-pointer"
+            title="Delete Material"
+          >
+            {deleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+            <span>{deleting ? 'Deleting...' : 'Delete'}</span>
+          </button>
+        )}
       </div>
 
     </div>

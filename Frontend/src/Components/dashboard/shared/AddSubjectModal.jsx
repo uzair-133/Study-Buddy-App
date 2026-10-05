@@ -12,7 +12,7 @@
 import { useState } from 'react'
 import api from '../../../api/axios'
 
-const AddSubjectModal = ({ onClose, onSubjectAdded }) => {
+const AddSubjectModal = ({ onClose, onSubjectAdded, classId = null }) => {
   const [title, setTitle] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -26,7 +26,10 @@ const AddSubjectModal = ({ onClose, onSubjectAdded }) => {
 
     setLoading(true)
     try {
-      const res = await api.post('/api/subject/create', { title }, { withCredentials: true })
+      const payload = { title }
+      if (classId) payload.classId = classId
+
+      const res = await api.post('/api/subject/create', payload, { withCredentials: true })
       onSubjectAdded(res.data.subject)   // Parent ko naya Subject bhej diya
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')

@@ -18,6 +18,7 @@ import ProtectedRoutes from '../src/Routes/ProtectedRoutes'
 import StudentLayOut from './Components/dashboard/student/StudentLayOut'
 import Student from './Pages/Dashboard/Student/Student'
 import StudentJoinedClass from './Pages/Dashboard/Student/StudentJoinedClass'
+import StudentClassDetail from './Pages/Dashboard/Student/StudentClassDetail'
 import StudentStudyPlanner from './Pages/Dashboard/Student/StudentStudyPlanner'
 import StudentQuiz from './Pages/Dashboard/Student/StudentQuiz'
 import StudentSmartPrep from './Pages/Dashboard/Student/StudentSmartPrep'
@@ -34,6 +35,7 @@ import TeacherSubjects from './Pages/Dashboard/Teacher/TeacherSubjects'
 import TeacherSubjectDetail from './Pages/Dashboard/Teacher/TeacherSubjectDetail'
 import TeacherChapterDetail from './Pages/Dashboard/Teacher/TeacherChapterDetail'
 import TeacherCreateClass from './Pages/Dashboard/Teacher/TeacherCreateClass'
+import TeacherClassDetail from './Pages/Dashboard/Teacher/TeacherClassDetail'
 import TeacherQuiz from './Pages/Dashboard/Teacher/TeacherQuiz'
 import TeacherSearch from './Pages/Dashboard/Teacher/TeacherSearch'
 import TeacherSetting from './Pages/Dashboard/Teacher/TeacherSetting'
@@ -79,6 +81,7 @@ const App = () => {
             <Route path='subjects/:subjectId' element={<StudentSubjectDetail />} />
             <Route path='subjects/:subjectId/chapters/:chapterId' element={<StudentChapterDetail />} />
             <Route path='joined-classes' element={<StudentJoinedClass />} />
+            <Route path='classes/:classId' element={<StudentClassDetail />} />
             <Route path='study-planner' element={<StudentStudyPlanner />} />
             <Route path='quiz-generator' element={<StudentQuiz />} />
             <Route path='smart-prep' element={<StudentSmartPrep />} />
@@ -96,6 +99,7 @@ const App = () => {
               <Route path='subjects/:subjectId' element={<TeacherSubjectDetail />} />
               <Route path='subjects/:subjectId/chapters/:chapterId' element={<TeacherChapterDetail />} />
               <Route path='create-classes' element={<TeacherCreateClass />} />
+              <Route path='classes/:classId' element={<TeacherClassDetail />} />
               <Route path='study-planner' element={<TeacherStudyPlanner />} />
               <Route path='quiz-generator' element={<TeacherQuiz />} />
               <Route path='search' element={<TeacherSearch />} />

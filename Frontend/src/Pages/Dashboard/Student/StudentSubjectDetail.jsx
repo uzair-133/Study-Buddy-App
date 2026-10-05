@@ -3,17 +3,33 @@ import AddChapterModal from "../../../Components/dashboard/shared/AddChapterModa
 import { useState, useEffect } from "react"
 import api from "../../../api/axios"
 import { useParams, Link } from "react-router-dom"
+import { ArrowLeft } from "lucide-react"
 
 const StudentSubjectDetail = () => {
   const { subjectId } = useParams()
+  const [subjectInfo, setSubjectInfo] = useState(null)
   const [chapters, setChapters] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
-    const fetchChapter = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true)
+        setError('')
+
+        // 1. Fetch Subject Info
+        try {
+          const subRes = await api.get(`/api/subject/${subjectId}`, { withCredentials: true })
+          if (subRes.data.subject) {
+            setSubjectInfo(subRes.data.subject)
+          }
+        } catch (e) {
+          console.log("Could not fetch subject info:", e)
+        }
+
+        // 2. Fetch Chapters
         const res = await api.get(`/api/chapter/getchapter/${subjectId}`, { withCredentials: true })
         setChapters(res.data.chapter || [])
       } catch (err) {
@@ -22,8 +38,9 @@ const StudentSubjectDetail = () => {
         setLoading(false)
       }
     }
+
     if (subjectId) {
-      fetchChapter()
+      fetchData()
     }
   }, [subjectId])
 
@@ -36,26 +53,41 @@ const StudentSubjectDetail = () => {
     setChapters(prevChapter => prevChapter.filter(chap => chap._id !== deletedId))
   }
 
+  const isClassSubject = Boolean(subjectInfo?.classId)
+  const backDestination = isClassSubject
+    ? `/student/classes/${subjectInfo.classId}`
+    : "/student/subjects"
+  const backLabel = isClassSubject ? "Back to Class" : "Back to Subjects"
+
   return (
     <>
       <section className="p-8 lg:p-12">
-        <Link to="/student/subjects" className="text-sm font-semibold text-violet hover:underline mb-4 inline-block">
-          &larr; Back to Subjects
+        <Link
+          to={backDestination}
+          className="text-sm font-semibold text-violet hover:underline mb-4 inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft size={16} /> {backLabel}
         </Link>
 
         <div className="flex flex-col space-y-4 md:flex md:flex-row md:justify-between md:items-center md:space-y-0">
           <div>
-            <h1 className="font-semibold font-display text-xl md:text-2xl">My Chapters</h1>
+            <h1 className="font-semibold font-display text-xl md:text-2xl text-ink">
+              {subjectInfo ? `${subjectInfo.title} - Chapters` : "Chapters"}
+            </h1>
             <p className="font-sans text-sm text-ink-soft">
-              Chapters you've created and organized for this subject.
+              {isClassSubject
+                ? "Course chapters and study materials uploaded by your instructor."
+                : "Chapters you've created and organized for this subject."}
             </p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-3 py-2 text-sm w-fit rounded-xl bg-violet text-white font-sans font-semibold hover:bg-violet/90 transition-colors"
-          >
-            + Add Chapter
-          </button>
+          {!isClassSubject && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-3 py-2 text-sm w-fit rounded-xl bg-violet text-white font-sans font-semibold hover:bg-violet/90 transition-colors"
+            >
+              + Add Chapter
+            </button>
+          )}
         </div>
 
         {loading && <p className="mt-6">Loading...</p>}
@@ -78,22 +110,26 @@ const StudentSubjectDetail = () => {
           <p className="mt-6 text-ink-soft">No chapters found for this subject yet.</p>
         )}
 
-        <div className="outline-dashed outline-2 outline-gray-300 rounded-xl p-6 mt-6 flex flex-col items-center justify-center gap-2">
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-3 py-1 text-sm rounded-xl bg-violet text-white font-sans font-semibold hover:bg-violet/90 transition-colors"
-          >
-            +
-          </button>
-          <p className="font-semibold font-sans text-gray-500">Add a new Chapter</p>
-        </div>
+        {!isClassSubject && (
+          <>
+            <div className="outline-dashed outline-2 outline-gray-300 rounded-xl p-6 mt-6 flex flex-col items-center justify-center gap-2">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-3 py-1 text-sm rounded-xl bg-violet text-white font-sans font-semibold hover:bg-violet/90 transition-colors"
+              >
+                +
+              </button>
+              <p className="font-semibold font-sans text-gray-500">Add a new Chapter</p>
+            </div>
 
-        {isModalOpen && (
-          <AddChapterModal
-            subjectId={subjectId}
-            onClose={() => setIsModalOpen(false)}
-            onChapterAdded={handleNewChapter}
-          />
+            {isModalOpen && (
+              <AddChapterModal
+                subjectId={subjectId}
+                onClose={() => setIsModalOpen(false)}
+                onChapterAdded={handleNewChapter}
+              />
+            )}
+          </>
         )}
       </section>
     </>
