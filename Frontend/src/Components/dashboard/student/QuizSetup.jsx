@@ -90,7 +90,7 @@ const QuizSetup = ({
             ) : (
               <div className="flex items-center justify-between p-3 bg-mint/10 border border-mint/30 rounded-xl text-ink text-xs font-sans font-semibold">
                 <div className="flex items-center gap-2 truncate">
-                  <File className="w-4 h-4 text-mint flex-shrink-0" />
+                  <File className="w-4 h-4 text-mint shrink-0" />
                   <span className="truncate">{customFile.name}</span>
                 </div>
                 <button
@@ -121,17 +121,17 @@ const QuizSetup = ({
           <label className="block font-display font-semibold text-base text-ink mb-2">
             2. Select Difficulty
           </label>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 ">
             {[
               { id: "easy", label: "Easy", activeClass: "bg-mint text-white border-mint" },
-              { id: "medium", label: "Medium", activeClass: "bg-violet text-white border-violet" },
+              { id: "medium", label: "Medium", activeClass: "bg-violet text-white border-violet "},
               { id: "difficult", label: "Difficult", activeClass: "bg-coral text-white border-coral" }
             ].map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => setDifficulty(item.id)}
-                className={`py-3 px-4 rounded-xl font-sans font-bold text-xs sm:text-sm border transition-all cursor-pointer ${
+                className={`py-2 px-2 md:py-3 md:px-4 rounded-xl font-sans font-bold text-xs sm:text-sm border transition-all cursor-pointer ${
                   difficulty === item.id
                     ? `${item.activeClass} shadow-sm`
                     : "bg-white text-ink-soft border-line hover:border-violet/40"
@@ -148,7 +148,7 @@ const QuizSetup = ({
           <label className="block font-display font-semibold text-base text-ink mb-2">
             3. Select Quiz Format
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-2 md:grid md:grid-cols-2 md:gap-3">
             {[
               { id: "mcq", label: "MCQs Mode", icon: Target, desc: "Multiple choice with score test" },
               { id: "question", label: "Questions Only", icon: MessageSquare, desc: "Study questions + AI Assistant" }
@@ -165,7 +165,7 @@ const QuizSetup = ({
                       : "bg-white text-ink border-line hover:border-violet/40"
                   }`}
                 >
-                  <IconComp className="w-5 h-5 flex-shrink-0" />
+                  <IconComp className="w-5 h-5 shrink-0" />
                   <div>
                     <div className="font-sans font-bold text-xs sm:text-sm">{item.label}</div>
                     <div className="font-sans text-[11px] opacity-80">{item.desc}</div>

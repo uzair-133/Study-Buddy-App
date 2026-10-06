@@ -114,7 +114,7 @@ const YourQuiz = () => {
 
   return (
     <main className="bg-white border border-line p-5 sm:p-6 rounded-2xl font-sans text-ink">
-      <div className="flex items-center justify-between mb-2">
+      <div className=" xs:flex xs:items-center xs:justify-between mb-2">
         <h1 className="font-semibold font-display text-lg text-ink flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-violet" />
           AI Quiz Generator
@@ -131,7 +131,7 @@ const YourQuiz = () => {
               },
             })
           }
-          className="text-violet text-xs font-semibold font-display hover:underline flex items-center gap-1 cursor-pointer"
+          className="text-violet text-xs font-semibold font-display px-2 pt-4 xs:px-0 py-0 pb-3 hover:underline flex items-center gap-1 cursor-pointer"
         >
           Open Generator <ArrowRight className="w-3.5 h-3.5" />
         </button>
@@ -148,7 +148,7 @@ const YourQuiz = () => {
         <select
           value={selectedSubject}
           onChange={(e) => setSelectedSubject(e.target.value)}
-          className="bg-paper border font-sans border-line rounded-xl px-3.5 py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
+          className="bg-paper border font-sans border-line rounded-xl py-2 md:px-3.5 md:py-2 text-xs font-semibold text-ink focus:outline-none focus:ring-2 focus:ring-violet/40"
         >
           <option value="">Select Subject</option>
           {subjects.map((sub) => (
