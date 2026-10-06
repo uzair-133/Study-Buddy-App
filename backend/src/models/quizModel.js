@@ -25,7 +25,7 @@ const quizQuestionSchema = new mongoose.Schema({
 
 const quizSchema = new mongoose.Schema(
   {
-    studentId: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,
@@ -79,5 +79,10 @@ const quizSchema = new mongoose.Schema(
   },
   { timestamps: true, strictPopulate: false }
 );
+
+
+
+quizSchema.index({ userId: 1, createdAt: -1 });
+quizSchema.index({ userId: 1, subjectId: 1 });
 
 module.exports = mongoose.model("Quiz", quizSchema);

@@ -25,6 +25,11 @@ const subjectSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+subjectSchema.index({studentId:1})
+subjectSchema.index({teacherId:1})
+subjectSchema.index({classId:1})
+
+
 subjectSchema.pre("validate", function () {
   const isStudentPersonal = this.studentId && !this.teacherId && !this.classId;
   const isTeacherPersonal = this.teacherId && !this.studentId && !this.classId;

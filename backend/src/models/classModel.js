@@ -18,8 +18,13 @@ const classSchema = new mongoose.Schema({
         uppercase: true,
         trim: true,
     },
-},
-     { timestamps: true })
+},{ timestamps: true })
+
+classSchema.index({
+    teacherId:1,
+    createdAt: -1 
+})
+
 
 const classModel = mongoose.model('class', classSchema)
 

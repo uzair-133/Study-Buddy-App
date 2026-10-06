@@ -11,7 +11,7 @@ const geminiService = require("../services/gemini.service");
  */
 const generateQuiz = async (req, res) => {
   try {
-    const studentId = req.user.id || req.user._id;
+    const userId = req.user.id || req.user._id;
     const {
       subjectId,
       chapterId,
@@ -81,7 +81,7 @@ const generateQuiz = async (req, res) => {
 
     // 5. Database me quiz record save karein
     const quiz = await quizModel.create({
-      studentId,
+      userId,
       subjectId: subjectId || null,
       chapterId: chapterId || null,
       subjectName: subjectName || "General",
@@ -114,11 +114,14 @@ const generateQuiz = async (req, res) => {
  */
 const submitQuizResult = async (req, res) => {
   try {
-    const studentId = req.user.id || req.user._id;
+    const userId = req.user.id || req.user._id;
     const { id } = req.params; // quizId
     const { answers } = req.body; // array of { questionId, selectedAnswer } or { index, selectedAnswer }
 
-    const quiz = await quizModel.findOne({ _id: id, studentId });
+    const quiz = await quizModel.findOne({
+      _id: id,
+      $or: [{ userId }, { studentId: userId }],
+    });
     if (!quiz) {
       return res.status(404).json({
         success: false,
@@ -175,9 +178,9 @@ const submitQuizResult = async (req, res) => {
  */
 const getStudentQuizzes = async (req, res) => {
   try {
-    const studentId = req.user.id || req.user._id;
+    const userId = req.user.id || req.user._id;
     const quizzes = await quizModel
-      .find({ studentId })
+      .find({ $or: [{ userId }, { studentId: userId }] })
       .populate("subjectId", "title")
       .populate("chapterId", "title")
       .sort({ createdAt: -1 });
@@ -201,11 +204,14 @@ const getStudentQuizzes = async (req, res) => {
  */
 const getQuizById = async (req, res) => {
   try {
-    const studentId = req.user.id || req.user._id;
+    const userId = req.user.id || req.user._id;
     const { id } = req.params;
 
     const quiz = await quizModel
-      .findOne({ _id: id, studentId })
+      .findOne({
+        _id: id,
+        $or: [{ userId }, { studentId: userId }],
+      })
       .populate("subjectId", "title")
       .populate("chapterId", "title");
 
@@ -234,10 +240,13 @@ const getQuizById = async (req, res) => {
  */
 const deleteQuiz = async (req, res) => {
   try {
-    const studentId = req.user.id || req.user._id;
+    const userId = req.user.id || req.user._id;
     const { id } = req.params;
 
-    const deleted = await quizModel.findOneAndDelete({ _id: id, studentId });
+    const deleted = await quizModel.findOneAndDelete({
+      _id: id,
+      $or: [{ userId }, { studentId: userId }],
+    });
     if (!deleted) {
       return res.status(404).json({
         success: false,

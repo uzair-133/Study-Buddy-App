@@ -36,6 +36,11 @@ const taskSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+taskSchema.index({
+    studentId:1,
+    createdAt: -1
+})
+
 const taskModal = mongoose.model('task', taskSchema);
 
 module.exports = taskModal;

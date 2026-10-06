@@ -25,6 +25,23 @@ const materialSchema = new mongoose.Schema({
     },
 }, { timestamps: true })
 
+materialSchema.index({
+    studentId:1
+})
+materialSchema.index({
+    teacherId:1
+})
+materialSchema.index({
+    chapterId: 1,
+    category: 1,
+    createdAt: -1,
+});
+materialSchema.index({
+    subjectId: 1,
+    category: 1,
+    createdAt: -1,
+});
+
 materialSchema.pre("validate", function() {
     const isStudent = this.studentId && !this.teacherId;
     const isTeacher = this.teacherId && !this.studentId;

@@ -24,6 +24,18 @@ teacherId: {
 }
 },{timestamps:true});
 
+
+chapterSchema.index({
+    subjectId:1,
+    createdAt: -1
+})
+chapterSchema.index({ 
+    studentId: 1 
+});
+chapterSchema.index({
+    teacherId: 1 
+});
+
 const chapterModel = mongoose.model("chapter",chapterSchema);
 
 module.exports = chapterModel;

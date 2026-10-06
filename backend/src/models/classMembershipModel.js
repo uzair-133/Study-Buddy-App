@@ -13,6 +13,12 @@ const classMemberShipSchema = new mongoose.Schema({
     },
 }, { timestamps: true })
 
+
+classMemberShipSchema.index({ 
+    classId: 1
+ });
+
+
 // remove duplicate entries for the same student and class combination
 classMemberShipSchema.index({ studentId: 1, classId: 1 }, { unique: true });
 
