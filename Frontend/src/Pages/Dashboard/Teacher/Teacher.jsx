@@ -25,12 +25,12 @@ const Teacher = () => {
 
         const subjectsCount =
           subjectRes.status === "fulfilled"
-            ? subjectRes.value.data.subject?.length || 0
+            ? (subjectRes.value.data.totalSubject ?? (subjectRes.value.data.subject?.length || 0))
             : 0;
 
         const filesCount =
           materialRes.status === "fulfilled"
-            ? materialRes.value.data?.length || 0
+            ? (materialRes.value.data.totalMaterial ?? (materialRes.value.data.materials?.length || materialRes.value.data?.length || 0))
             : 0;
 
         const classesCount =

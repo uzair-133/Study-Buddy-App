@@ -76,7 +76,7 @@ const TeacherChapterDetail = () => {
         params: { chapterId },
         withCredentials: true,
       });
-      setMaterials(matRes.data || []);
+      setMaterials(matRes.data.materials || matRes.data || []);
     } catch (err) {
       console.error('Error fetching chapter details:', err);
       setError(err.response?.data?.message || 'Failed to load chapter materials.');

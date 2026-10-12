@@ -28,10 +28,10 @@ const Student = () => {
         });
 
         setStats({
-          subjects: subjectRes.data.subject?.length || 0,
+          subjects: subjectRes.data.totalSubject ?? (subjectRes.data.subject?.length || 0),
           joinedClasses: joinedRes.data.data?.length || joinedRes.data.count || 0,
-          filesUploaded: materialRes.data?.length || 0,
-          quizzesTaken: quizRes.data.quizzes?.length || quizRes.data.count || 0,
+          filesUploaded: materialRes.data.totalMaterial ?? (materialRes.data.materials?.length || materialRes.data?.length || 0),
+          quizzesTaken: quizRes.data.totalQuiz ?? (quizRes.data.quizzes?.length || quizRes.data.count || 0),
         });
       } catch (err) {
         console.log("Stats fetch error:", err);

@@ -17,14 +17,14 @@ const SubjectCard = ({ subject, onDelete }) => {
           `/api/chapter/getchapter/${subject._id}`,
           { withCredentials: true },
         );
-        setChapterCount(chapterRes.data.chapter?.length || 0);
+        setChapterCount(chapterRes.data.totalChapter ?? (chapterRes.data.chapter?.length || 0));
 
         const materialRes = await api.get("/api/material/materials", {
           params: { subjectId: subject._id },
           withCredentials: true,
         });
 
-        setFileCount(materialRes.data?.length || 0);
+        setFileCount(materialRes.data.totalMaterial ?? (materialRes.data.materials?.length || materialRes.data?.length || 0));
       } catch (err) {
         console.log(err);
       }

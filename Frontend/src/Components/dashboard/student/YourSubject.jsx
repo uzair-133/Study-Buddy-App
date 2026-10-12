@@ -14,14 +14,14 @@ const YourSubject = ({ title, type, _id }) => {
       const chapterCount = await api.get(`/api/chapter/getchapter/${_id}`,
         { withCredentials: true },
       );
-      setChapter(chapterCount.data?.chapter?.length || 0)
+      setChapter(chapterCount.data?.totalChapter ?? (chapterCount.data?.chapter?.length || 0))
       setError('')
 
       const materialRes = await api.get("/api/material/materials", {  
 params: { subjectId: _id },
         withCredentials: true,
       });
-      setFileCount(materialRes.data?.length || 0);      
+      setFileCount(materialRes.data.totalMaterial ?? (materialRes.data.materials?.length || materialRes.data?.length || 0));      
     }
     catch(err) {
       setError(err.response?.data?.message || "something went Wrong")

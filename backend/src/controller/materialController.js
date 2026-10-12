@@ -46,7 +46,7 @@ const uploadMaterial = async (req, res) => {
 // 2. Get Study Materials Controller
 const getMaterial = async (req, res) => {
   try {
-    const { chapterId, subjectId, category } = req.query;
+    const { chapterId, subjectId, category, page: pageQuery, limit: limitQuery } = req.query;
     const userId = req.user.id || req.user._id;
 
     const filter = {};
@@ -59,8 +59,72 @@ const getMaterial = async (req, res) => {
       filter.$or = [{ studentId: userId }, { teacherId: userId }];
     }
 
-    const materials = await materialModal.find(filter).sort({ createdAt: -1 });
-    res.status(200).json(materials);
+    // Pagination Validation
+    if (
+      pageQuery !== undefined &&
+      (!/^[1-9]\d*$/.test(pageQuery) ||
+        !Number.isSafeInteger(Number(pageQuery)))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be a positive integer",
+      });
+    }
+
+    if (
+      limitQuery !== undefined &&
+      (!/^[1-9]\d*$/.test(limitQuery) ||
+        !Number.isSafeInteger(Number(limitQuery)) ||
+        Number(limitQuery) > 50)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Limit must be between 1 and 50",
+      });
+    }
+
+    const limit = Number(limitQuery ?? 10);
+    const page = Number(pageQuery ?? 1);
+    const skip = (page - 1) * limit;
+
+    const totalMaterial = await materialModal.countDocuments(filter);
+    const totalPages = Math.ceil(totalMaterial / limit);
+
+    if (totalMaterial === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No materials found",
+        materials: [],
+        currentPage: page,
+        limit,
+        totalMaterial: 0,
+        totalPages: 0,
+      });
+    }
+
+    if (page > totalPages) {
+      return res.status(400).json({
+        success: false,
+        message: "Requested page is not available",
+        totalPages,
+      });
+    }
+
+    const materials = await materialModal
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      message: "Materials fetched successfully",
+      materials,
+      currentPage: page,
+      limit,
+      totalMaterial,
+      totalPages,
+    });
   } catch (err) {
     res.status(500).json({ message: "Internal server error", error: err.message });
   }

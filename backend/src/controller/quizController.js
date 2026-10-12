@@ -179,16 +179,75 @@ const submitQuizResult = async (req, res) => {
 const getStudentQuizzes = async (req, res) => {
   try {
     const userId = req.user.id || req.user._id;
+    const {page:pageQuery,limit:limitQuery} = req.query;
+
+    if (
+      pageQuery !== undefined &&
+      (!/^[1-9]\d*$/.test(pageQuery) ||
+        !Number.isSafeInteger(Number(pageQuery)))
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Page must be a positive integer",
+      });
+    }
+
+    if (
+      limitQuery !== undefined &&
+      (!/^[1-9]\d*$/.test(limitQuery) ||
+        !Number.isSafeInteger(Number(limitQuery)) ||
+        Number(limitQuery) > 50)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Limit must be between 1 and 50",
+      });
+    }
+
+    const filter = { $or: [{ userId }, { studentId: userId }] };
+    const limit = Number(limitQuery ?? 10);
+    const page = Number(pageQuery ?? 1);
+    const skip = (page - 1) * limit;
+
+    const totalQuiz = await quizModel.countDocuments(filter);
+    const totalPages = Math.ceil(totalQuiz / limit);
+
+      if (totalQuiz === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No quizzes found",
+        quizzes: [],
+        currentPage: page,
+        limit,
+        totalQuiz: 0,
+        totalPages: 0,
+      });
+    }
+
+    if (page > totalPages) {
+      return res.status(400).json({
+        success: false,
+        message: "Requested page is not available",
+        totalPages,
+      });
+    }
+
     const quizzes = await quizModel
-      .find({ $or: [{ userId }, { studentId: userId }] })
+      .find(filter)
       .populate("subjectId", "title")
       .populate("chapterId", "title")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
     return res.status(200).json({
       success: true,
       count: quizzes.length,
       quizzes,
+      currentPage: page,
+      limit,
+      totalQuiz,
+      totalPages,
     });
   } catch (error) {
     console.error("Error in getStudentQuizzes controller:", error);
