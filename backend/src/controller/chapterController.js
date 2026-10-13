@@ -110,7 +110,7 @@ const getChapter = async (req, res) => {
         totalPages,
       });
     }
-        const chapter = await chapterModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit);
+        const chapter = await chapterModel.find(filter).sort({ createdAt: -1,_id:-1 }).skip(skip).limit(limit);
         res.status(200).json({
             success: true,
             message: "Get All Chapter",

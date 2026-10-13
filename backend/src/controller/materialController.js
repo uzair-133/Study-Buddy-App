@@ -112,7 +112,7 @@ const getMaterial = async (req, res) => {
 
     const materials = await materialModal
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 ,_id:-1})
       .skip(skip)
       .limit(limit);
 

@@ -154,7 +154,7 @@ const getSubject = async (req, res) => {
 
     const subject = await subjectModal
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1,_id:-1 })
       .skip(skip)
       .limit(limit);
 

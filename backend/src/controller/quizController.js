@@ -236,7 +236,7 @@ const getStudentQuizzes = async (req, res) => {
       .find(filter)
       .populate("subjectId", "title")
       .populate("chapterId", "title")
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1 , _id:-1})
       .skip(skip)
       .limit(limit);
 
