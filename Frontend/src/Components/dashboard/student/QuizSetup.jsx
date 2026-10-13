@@ -209,7 +209,7 @@ const QuizSetup = ({
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Generating Quiz via Gemini AI...</span>
+                <span>Generating Quiz...</span>
               </>
             ) : (
               <>

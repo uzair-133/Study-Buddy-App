@@ -53,9 +53,9 @@ const TeacherChapterDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('lecture');
 
-  useEffect(() => {
-    fetchChapterAndMaterials();
-  }, [subjectId, chapterId]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 8;
 
   const fetchChapterAndMaterials = async () => {
     setLoading(true);
@@ -71,12 +71,13 @@ const TeacherChapterDetail = () => {
         }
       }
 
-      // 2. Fetch materials for this chapter
+      // 2. Fetch materials for this chapter with pagination
       const matRes = await api.get('/api/material/materials', {
-        params: { chapterId },
+        params: { chapterId, page: currentPage, limit },
         withCredentials: true,
       });
       setMaterials(matRes.data.materials || matRes.data || []);
+      setTotalPages(matRes.data.totalPages || 1);
     } catch (err) {
       console.error('Error fetching chapter details:', err);
       setError(err.response?.data?.message || 'Failed to load chapter materials.');
@@ -85,17 +86,30 @@ const TeacherChapterDetail = () => {
     }
   };
 
+  useEffect(() => {
+    fetchChapterAndMaterials();
+  }, [subjectId, chapterId, currentPage]);
+
   const handleOpenUploadModal = (category = 'lecture') => {
     setSelectedCategory(category);
     setIsModalOpen(true);
   };
 
-  const handleMaterialUploaded = (newMaterial) => {
-    setMaterials((prev) => [newMaterial, ...prev]);
+  const handleMaterialUploaded = () => {
+    setIsModalOpen(false);
+    if (currentPage === 1) {
+      fetchChapterAndMaterials();
+    } else {
+      setCurrentPage(1);
+    }
   };
 
   const handleMaterialDeleted = (deletedId) => {
-    setMaterials((prev) => prev.filter((m) => m._id !== deletedId));
+    if (materials.length === 1 && currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    } else {
+      fetchChapterAndMaterials();
+    }
   };
 
   return (
@@ -222,6 +236,57 @@ const TeacherChapterDetail = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {/* Prev Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+              currentPage === 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-xs"
+            }`}
+          >
+            Prev
+          </button>
+
+          {/* Number Buttons */}
+          {Array.from({ length: totalPages }, (_, index) => {
+            const pageNumber = index + 1
+            const isActive = currentPage === pageNumber
+
+            return (
+              <button
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={`w-9 h-9 rounded-lg text-sm font-semibold transition cursor-pointer ${
+                  isActive
+                    ? "bg-violet text-white shadow-xs"
+                    : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            )
+          })}
+
+          {/* Next Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+              currentPage === totalPages
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-xs"
+            }`}
+          >
+            Next
+          </button>
         </div>
       )}
 

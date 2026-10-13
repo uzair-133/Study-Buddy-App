@@ -13,13 +13,20 @@ const StudentSubjectDetail = () => {
   const [error, setError] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true)
-        setError('')
+  const [currentPage,setCurrentPage] = useState(1);
+  const [totalPages,setTotalPages] = useState(1);
 
-        // 1. Fetch Subject Info
+  const limit = 3;
+
+
+  // 1. Data Fetch Function (bahar define kiya taake handleNewChapter aur handleChapterDelete bhi use kar sakein)
+  const fetchData = async () => {
+    try {
+      setLoading(true)
+      setError('')
+
+      // Subject Info (sirf tab fetch karo agar pehle se na ho)
+      if (!subjectInfo) {
         try {
           const subRes = await api.get(`/api/subject/${subjectId}`, { withCredentials: true })
           if (subRes.data.subject) {
@@ -28,29 +35,46 @@ const StudentSubjectDetail = () => {
         } catch (e) {
           console.log("Could not fetch subject info:", e)
         }
-
-        // 2. Fetch Chapters
-        const res = await api.get(`/api/chapter/getchapter/${subjectId}`, { withCredentials: true })
-        setChapters(res.data.chapter || [])
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch Chapter')
-      } finally {
-        setLoading(false)
       }
-    }
 
+      // Fetch Chapters with Pagination
+      const res = await api.get(`/api/chapter/getchapter/${subjectId}?page=${currentPage}&limit=${limit}`, { 
+        withCredentials: true 
+      })
+      setChapters(res.data.chapter || [])
+      setTotalPages(res.data.totalPages || 1)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to fetch Chapter')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 2. useEffect: subjectId ya currentPage badalne par run hoga
+  useEffect(() => {
     if (subjectId) {
       fetchData()
     }
-  }, [subjectId])
+  }, [subjectId, currentPage])
 
-  const handleNewChapter = (newChapter) => {
-    setChapters(prev => [newChapter, ...prev])
+  // Naya chapter add hone par
+  const handleNewChapter = () => {
     setIsModalOpen(false)
+    if (currentPage === 1) {
+      fetchData()
+    } else {
+      setCurrentPage(1)
+    }
   }
 
+  // Chapter delete hone par
   const handleChapterDelete = (deletedId) => {
-    setChapters(prevChapter => prevChapter.filter(chap => chap._id !== deletedId))
+    // Agar current page par aakhri chapter tha aur page 1 se aagay hain to pichle page par jao
+    if (chapters.length === 1 && currentPage > 1) {
+      setCurrentPage(prev => prev - 1)
+    } else {
+      fetchData()
+    }
   }
 
   const isClassSubject = Boolean(subjectInfo?.classId)
@@ -105,6 +129,55 @@ const StudentSubjectDetail = () => {
             ))}
           </div>
         )}
+         {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {/* 1. Prev Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+              currentPage === 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-xs"
+            }`}
+          >
+            Prev
+          </button>
+
+          {/* 2. Number Buttons: Backend ke totalPages ke mutabiq dynamic array banta hai */}
+          {Array.from({ length: totalPages }, (_, index) => {
+            const pageNumber = index + 1
+            const isActive = currentPage === pageNumber
+
+            return (
+              <button
+                key={pageNumber}
+                onClick={() => setCurrentPage(pageNumber)}
+                className={`w-9 h-9 rounded-lg text-sm font-semibold transition cursor-pointer ${
+                  isActive
+                    ? "bg-violet text-white shadow-xs"
+                    : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            )
+          })}
+
+          {/* 3. Next Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition cursor-pointer ${
+              currentPage === totalPages
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-xs"
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
         {!loading && chapters.length === 0 && !error && (
           <p className="mt-6 text-ink-soft">No chapters found for this subject yet.</p>

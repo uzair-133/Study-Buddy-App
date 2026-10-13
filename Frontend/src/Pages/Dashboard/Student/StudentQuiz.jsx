@@ -45,12 +45,23 @@ const StudentQuiz = () => {
   // Quiz history state
   const [quizHistory, setQuizHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalPages, setHistoryTotalPages] = useState(1);
+  const [totalQuizCount, setTotalQuizCount] = useState(0);
+  const historyLimit = 6;
 
   // 1. Fetch Subjects on Mount
   useEffect(() => {
     fetchSubjects();
-    fetchQuizHistory();
+    fetchQuizHistory(1);
   }, []);
+
+  // Fetch History when page or tab changes
+  useEffect(() => {
+    if (activeTab === "history") {
+      fetchQuizHistory(historyPage);
+    }
+  }, [historyPage, activeTab]);
 
   // 2. Fetch Chapters when Subject changes
   useEffect(() => {
@@ -85,11 +96,13 @@ const StudentQuiz = () => {
     }
   };
 
-  const fetchQuizHistory = async () => {
+  const fetchQuizHistory = async (page = historyPage) => {
     try {
       setLoadingHistory(true);
-      const res = await api.get("/api/quiz/history");
+      const res = await api.get(`/api/quiz/history?page=${page}&limit=${historyLimit}`);
       setQuizHistory(res.data?.quizzes || []);
+      setHistoryTotalPages(res.data?.totalPages || 1);
+      setTotalQuizCount(res.data?.totalQuiz || 0);
     } catch (err) {
       console.error("Failed to load quiz history:", err);
     } finally {
@@ -234,10 +247,14 @@ const StudentQuiz = () => {
     e.stopPropagation();
     try {
       await api.delete(`/api/quiz/${id}`);
-      setQuizHistory((prev) => prev.filter((q) => q._id !== id));
       if (currentQuiz?._id === id) {
         setCurrentQuiz(null);
         setActiveTab("setup");
+      }
+      if (quizHistory.length === 1 && historyPage > 1) {
+        setHistoryPage((prev) => prev - 1);
+      } else {
+        fetchQuizHistory(historyPage);
       }
     } catch (err) {
       console.error("Failed to delete quiz:", err);
@@ -288,7 +305,7 @@ const StudentQuiz = () => {
       setChatMessages([
         {
           sender: "ai",
-          text: `Loaded saved quiz. Click "💡 Get Answer" on any question or ask any question in chat!`
+          text: `Loaded saved quiz. Click "Get Answer" on any question or ask any question in chat!`
         }
       ]);
     }
@@ -380,7 +397,7 @@ const StudentQuiz = () => {
             <button
               onClick={() => {
                 setActiveTab("history");
-                fetchQuizHistory();
+                fetchQuizHistory(historyPage);
               }}
               className={`px-4 py-2 rounded-xl font-sans font-semibold text-xs sm:text-sm transition-all cursor-pointer ${
                 activeTab === "history"
@@ -388,7 +405,7 @@ const StudentQuiz = () => {
                   : "text-ink-soft hover:text-ink"
               }`}
             >
-              History ({quizHistory.length})
+              History ({totalQuizCount || quizHistory.length})
             </button>
           </div>
         </div>
@@ -462,9 +479,12 @@ const StudentQuiz = () => {
           <HistoryQuiz
             quizHistory={quizHistory}
             loadingHistory={loadingHistory}
-            fetchQuizHistory={fetchQuizHistory}
+            fetchQuizHistory={() => fetchQuizHistory(historyPage)}
             handleViewSavedQuiz={handleViewSavedQuiz}
             handleDeleteQuiz={handleDeleteQuiz}
+            currentPage={historyPage}
+            setCurrentPage={setHistoryPage}
+            totalPages={historyTotalPages}
           />
         )}
       </div>
