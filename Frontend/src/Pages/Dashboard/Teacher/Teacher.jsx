@@ -53,7 +53,7 @@ const Teacher = () => {
 
   return (
     <>
-      <main className="p-10">
+      <main className="p-4 sm:p-6 md:p-8 lg:p-10">
         <Welcome />
         <div className="grid grid-cols-1 gap-2 xs:grid xs:grid-cols-2 xs:gap-2 sm:grid sm:grid-cols-2 sm:gap-2 md:grid md:grid-cols-3 md:gap-3 lg:grid lg:grid-cols-4 lg:gap-4 pt-8">
           <StatsCard number={stats.subjects} label="My Subject" />
