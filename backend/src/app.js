@@ -74,4 +74,11 @@ app.use("/api/quiz", quizRoutes);
 
 app.use("/api/class", classRoutes);
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "StudyBuddy Backend API is running successfully on Vercel!",
+  });
+});
+
 module.exports = app;
