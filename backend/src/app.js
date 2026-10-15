@@ -16,6 +16,9 @@ const searchRoutes = require("./routes/searchRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const classRoutes = require("./routes/classRoutes");
 const cors = require("cors");
+const ConnectToDb = require("./db/db");
+ConnectToDb();
+
 const allowedOrigins = [
   "http://localhost:5173",
   "http://127.0.0.1:5173",
@@ -29,7 +32,9 @@ const corsOptions = {
     if (
       !origin ||
       allowedOrigins.includes(origin) ||
-      /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)
+      /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ||
+      (origin && origin.endsWith(".netlify.app")) ||
+      (origin && origin.endsWith(".vercel.app"))
     ) {
       callback(null, true);
     } else {

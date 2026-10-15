@@ -1,14 +1,18 @@
 const mongoose = require('mongoose');
-// const {generateJoinCode} = require('../utils/generateJoinCode')
-const ConnectToDb = async()=> {
-    try{
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log("MongoDB is Connected")
-    // const code = await generateJoinCode();
-    // console.log(code)
+
+let isConnected = false;
+
+const ConnectToDb = async () => {
+    if (isConnected || mongoose.connection.readyState >= 1) {
+        return;
     }
-    catch(err){
-      console.log("MongoDB is Not Connected",err)  
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        isConnected = true;
+        console.log("MongoDB is Connected");
+    } catch (err) {
+        console.log("MongoDB is Not Connected", err);
     }
-}
-module.exports = ConnectToDb
+};
+
+module.exports = ConnectToDb;

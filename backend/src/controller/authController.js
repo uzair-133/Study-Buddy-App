@@ -30,15 +30,18 @@ const SignUp = async (req, res) => {
             isVerified: false,
             verificationToken
         })
+
+        const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`
+        try {
+            await sendVerificationEmail(email, verificationLink)
+        } catch (emailErr) {
+            console.error("Email sending failed:", emailErr)
+        }
+
         res.status(201).json({
-            message: "User Created Successfully",
+            message: "User Created Successfully. Verification email sent.",
             user
         })
-        const verificationLink = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`
-        sendVerificationEmail(email, verificationLink).catch(err => {
-            console.log("Email sending failed:", err)
-        })
-
     }
     catch (err) {
         res.status(500).json({
@@ -152,10 +155,11 @@ const LogIn = async (req, res) => {
         }, process.env.JWT_SECRET, {
             expiresIn: "7d"
         })
+        const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
         res.cookie("token", token, {
             httpOnly: true,
-            sameSite: 'lax',
-            secure: false,
+            sameSite: isProduction ? 'none' : 'lax',
+            secure: isProduction,
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
         res.status(200).json({
@@ -178,12 +182,15 @@ const LogIn = async (req, res) => {
 }
 
 const logOut = async (req, res) => {
-
-    res.clearCookie("token")
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+    res.clearCookie("token", {
+        httpOnly: true,
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction
+    })
     res.status(200).json({
         message: "LogOut user"
     })
-
 }
 
 const getMe = async (req, res) => {

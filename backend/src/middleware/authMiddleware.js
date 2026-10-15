@@ -2,9 +2,17 @@ const jwt = require("jsonwebtoken")
 const userModel = require("../models/userModel")
 
 
+const getToken = (req) => {
+    if (req.cookies && req.cookies.token) return req.cookies.token;
+    if (req.headers && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+        return req.headers.authorization.split(" ")[1];
+    }
+    return null;
+};
+
 const authStudent = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = getToken(req);
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"
@@ -26,7 +34,7 @@ const authStudent = async (req, res, next) => {
 }
 const authTeacher = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = getToken(req);
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"
@@ -48,7 +56,7 @@ const authTeacher = async (req, res, next) => {
 }
 const authAdmin = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = getToken(req);
         if (!token) {
             return res.status(403).json({
                 message: "invalid request"

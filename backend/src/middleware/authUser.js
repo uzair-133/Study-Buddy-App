@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const authUser = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = (req.cookies && req.cookies.token) || (req.headers.authorization && req.headers.authorization.startsWith("Bearer ") ? req.headers.authorization.split(" ")[1] : null);
         if (!token) {
             return res.status(400).json({
                 message: "user not found"
