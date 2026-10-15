@@ -16,8 +16,13 @@ const searchRoutes = require("./routes/searchRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const classRoutes = require("./routes/classRoutes");
 const cors = require("cors");
+const mongoose = require("mongoose");
 const ConnectToDb = require("./db/db");
-ConnectToDb();
+
+app.use(async (req, res, next) => {
+  await ConnectToDb();
+  next();
+});
 
 const allowedOrigins = [
   "http://localhost:5173",
@@ -74,10 +79,13 @@ app.use("/api/quiz", quizRoutes);
 
 app.use("/api/class", classRoutes);
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  await ConnectToDb();
+  const isDbConnected = mongoose.connection.readyState === 1;
   res.status(200).json({
     status: "success",
     message: "StudyBuddy Backend API is running successfully on Vercel!",
+    database: isDbConnected ? "Connected" : "Disconnected",
   });
 });
 
