@@ -181,6 +181,9 @@ const LogIn = async (req, res) => {
     }
 }
 
+
+
+//Logout Controller
 const logOut = async (req, res) => {
     const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
     res.clearCookie("token", {
@@ -193,6 +196,9 @@ const logOut = async (req, res) => {
     })
 }
 
+
+
+//get user Data
 const getMe = async (req, res) => {
     try {
         const user = await userModel.findById(req.user.id).select('-password')

@@ -32,21 +32,27 @@ const {
 const { authStudent } = require("../middleware/authMiddleware");
 
 // Single endpoint for generating quizzes (MCQ or Question Only mode) with optional PDF file upload
+// /api/quiz/generate
 router.post("/generate", authStudent, uploadMiddleware, generateQuiz);
 
 // Ask AI Assistant follow-up question
+// /api/quiz/ask-assistant
 router.post("/ask-assistant", authStudent, askAssistant);
 
 // Submit quiz score / user answers
+// /api/quiz/submit/:id
 router.post("/submit/:id", authStudent, submitQuizResult);
 
 // Get student quiz history
+// /api/quiz/history
 router.get("/history", authStudent, getStudentQuizzes);
 
 // Get single quiz by ID
+// /api/quiz/:id
 router.get("/:id", authStudent, getQuizById);
 
 // Delete quiz from history
+// /api/quiz/:id
 router.delete("/:id", authStudent, deleteQuiz);
 
 module.exports = router;

@@ -16,7 +16,7 @@ const updateProfile = async (req, res) => {
       "/studyBuddy/avatars"
     );
 
-    // Database me user ka profile image update karein
+    // Database me user ka profile image update karnay kay liye
     const userId = req.user.id || req.user._id;
     const updatedUser = await userModel
       .findByIdAndUpdate(
@@ -66,7 +66,7 @@ const updateName = async (req, res) => {
       return res.status(400).json({ message: "User already exists with this name" });
     }
 
-    // Name update karein
+    // For Name Update
     const updatedUser = await userModel
       .findByIdAndUpdate(req.user.id, { name }, { returnDocument: "after" })
       .select("-password");

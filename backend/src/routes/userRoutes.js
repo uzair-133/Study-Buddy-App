@@ -27,8 +27,13 @@ const uploadProfileMiddleware = (req, res, next) => {
   });
 };
 
+// /api/user/profile
 router.patch('/profile', authUser, uploadProfileMiddleware, userController.updateProfile);
+
+// /api/user/delete/:id
 router.delete('/delete/:id', authUser, userController.deleteUser);
+
+// /api/user/update
 router.put('/update', authUser, userController.updateName);
 
 module.exports = router;

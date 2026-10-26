@@ -1,5 +1,8 @@
 const taskModal = require('../models/taskModal')
 
+
+
+//create task 
 const createtask = async (req, res) => {
   try {
     const { title, note, date, month, subject } = req.body
@@ -18,6 +21,8 @@ const createtask = async (req, res) => {
   }
 }
 
+
+//get task
 const getTask = async (req, res) => {
   try {
     const task = await taskModal.find({ studentId: req.user.id }).sort({ createdAt: -1 })
@@ -27,6 +32,8 @@ const getTask = async (req, res) => {
   }
 }
 
+
+//update task
 const updateTask = async (req, res) => {
   try {
     const { taskId } = req.params
@@ -46,6 +53,8 @@ const updateTask = async (req, res) => {
   }
 }
 
+
+//delete Task
 const deleteTask = async (req, res) => {
   try {
     const { taskId } = req.params

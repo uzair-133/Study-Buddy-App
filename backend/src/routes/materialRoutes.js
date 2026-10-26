@@ -23,10 +23,14 @@ const uploadMiddleware = (req, res, next) => {
     next();
   });
 };
+//   /api/material/uploadMaterial
+router.post("/uploadMaterial", authMiddleware.authStudent, uploadMiddleware, uploadMaterial);
 
-router.post( "/uploadMaterial",authMiddleware.authStudent,  uploadMiddleware, uploadMaterial);
+// /api/material/materials
 router.get("/materials", authMiddleware.authStudent, getMaterial);
-router.delete(  "/materials/:materialId", authMiddleware.authStudent,  deleteMaterial);
+
+//  /api/material/materials/id
+router.delete("/materials/:materialId", authMiddleware.authStudent, deleteMaterial);
 
 
 module.exports = router;

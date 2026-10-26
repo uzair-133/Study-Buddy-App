@@ -16,13 +16,13 @@ const uploadMaterial = async (req, res) => {
       return res.status(400).json({ message: "category, chapterId, and subjectId are required" });
     }
 
-    // File ko ImageKit par upload karein
+    // File ko ImageKit par upload karnay kay liye
     const result = await uploadFile(file.buffer.toString("base64"), fileName, "/studyBuddy/files");
 
     const userId = req.user.id || req.user._id;
     const isTeacher = req.user.role === "teacher";
 
-    // Material database me save karein
+
     const material = await materialModal.create({
       fileName,
       fileUrl: result.url,
@@ -112,7 +112,7 @@ const getMaterial = async (req, res) => {
 
     const materials = await materialModal
       .find(filter)
-      .sort({ createdAt: -1 ,_id:-1})
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit);
 

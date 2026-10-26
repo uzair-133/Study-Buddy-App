@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { searchAll } = require('../controller/searchController');
-const { authStudent } = require('../middleware/authMiddleware')
+const {authUser} = require('../middleware/authUser')
 
-router.get('/', authStudent, searchAll)
+// /api/search
+router.get('/', authUser, searchAll);
 
 
 

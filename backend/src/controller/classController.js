@@ -3,6 +3,9 @@ const classModel = require("../models/classModel");
 const classMemberShipModel = require("../models/classMembershipModel");
 const { generateJoinCode } = require("../utils/generateJoinCode");
 
+
+
+//create class
 const createClass = async (req, res) => {
   try {
     const { className } = req.body;
@@ -37,6 +40,8 @@ const createClass = async (req, res) => {
   }
 };
 
+
+//Join Class
 const joinClass = async (req, res) => {
   try {
     const { joinCode } = req.body;
@@ -87,6 +92,8 @@ const joinClass = async (req, res) => {
   }
 };
 
+
+//Get class
 const getMyClass = async (req, res) => {
   try {
     const teacherId = req.user?._id || req.user?.id;
@@ -112,6 +119,8 @@ const getMyClass = async (req, res) => {
   }
 };
 
+
+// get Joined Class
 const getJoinedClass = async (req, res) => {
   try {
     const studentId = req.user?._id || req.user?.id;
@@ -226,7 +235,7 @@ const getClassById = async (req, res) => {
         success: false,
         message: "Class not found",
 
-        
+
       });
     }
     return res.status(200).json({

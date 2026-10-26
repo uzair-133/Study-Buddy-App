@@ -63,8 +63,7 @@ const generateQuiz = async (req, res) => {
     // 4. Fallback text content agar file na milay
     const textContent =
       content ||
-      `Generate a quiz about ${subjectName || "General Topic"} ${
-        chapterName ? "- " + chapterName : ""
+      `Generate a quiz about ${subjectName || "General Topic"} ${chapterName ? "- " + chapterName : ""
       }. Focus on core concepts.`;
 
     // 4. Gemini AI se quiz generate karein
@@ -79,7 +78,7 @@ const generateQuiz = async (req, res) => {
       chapterName,
     });
 
-    // 5. Database me quiz record save karein
+
     const quiz = await quizModel.create({
       userId,
       subjectId: subjectId || null,
@@ -179,7 +178,7 @@ const submitQuizResult = async (req, res) => {
 const getStudentQuizzes = async (req, res) => {
   try {
     const userId = req.user.id || req.user._id;
-    const {page:pageQuery,limit:limitQuery} = req.query;
+    const { page: pageQuery, limit: limitQuery } = req.query;
 
     if (
       pageQuery !== undefined &&
@@ -212,7 +211,7 @@ const getStudentQuizzes = async (req, res) => {
     const totalQuiz = await quizModel.countDocuments(filter);
     const totalPages = Math.ceil(totalQuiz / limit);
 
-      if (totalQuiz === 0) {
+    if (totalQuiz === 0) {
       return res.status(200).json({
         success: true,
         message: "No quizzes found",
@@ -236,7 +235,7 @@ const getStudentQuizzes = async (req, res) => {
       .find(filter)
       .populate("subjectId", "title")
       .populate("chapterId", "title")
-      .sort({ createdAt: -1 , _id:-1})
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit);
 
