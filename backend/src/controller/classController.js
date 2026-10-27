@@ -105,7 +105,8 @@ const getMyClass = async (req, res) => {
     }
     const allClass = await classModel
       .find({ teacherId })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
     res.status(200).json({
       success: true,
       message: "Get All Classes",
@@ -136,7 +137,8 @@ const getJoinedClass = async (req, res) => {
         path: "classId",
         populate: { path: "teacherId", select: "name email profileImage" },
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -229,7 +231,7 @@ const getClassById = async (req, res) => {
         message: "Invalid Class ID",
       });
     }
-    const targetedClass = await classModel.findById(classId).populate("teacherId", "name email");
+    const targetedClass = await classModel.findById(classId).populate("teacherId", "name email").lean();
     if (!targetedClass) {
       return res.status(404).json({
         success: false,

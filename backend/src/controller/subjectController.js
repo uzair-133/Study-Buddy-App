@@ -156,7 +156,8 @@ const getSubject = async (req, res) => {
       .find(filter)
       .sort({ createdAt: -1,_id:-1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     res.status(200).json({
       success: true,
@@ -194,7 +195,7 @@ const deleteSubject = async (req, res) => {
 // 4. Get Single Subject By ID Controller
 const getSubjectById = async (req, res) => {
   try {
-    const subject = await subjectModal.findById(req.params.subjectId);
+    const subject = await subjectModal.findById(req.params.subjectId).lean();
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
     }

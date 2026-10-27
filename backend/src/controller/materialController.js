@@ -114,7 +114,8 @@ const getMaterial = async (req, res) => {
       .find(filter)
       .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     res.status(200).json({
       success: true,

@@ -31,12 +31,13 @@ const searchAll = async (req, res) => {
       materialFilter.teacherId = userId;
     } else {
       // Student: Joined classes + Personal data
-      const memberships = await classMemberShipModel.find({ studentId: userId }).select("classId");
+      const memberships = await classMemberShipModel.find({ studentId: userId })
+      .select("classId").lean()
       const classIds = memberships.map((m) => m.classId);
 
       const userSubjects = await subjectModel
         .find({ $or: [{ studentId: userId }, { classId: { $in: classIds } }] })
-        .select("_id");
+        .select("_id").lean();
       const subjectIds = userSubjects.map((s) => s._id);
 
       subjectFilter.$or = [{ studentId: userId }, { classId: { $in: classIds } }];
@@ -48,11 +49,10 @@ const searchAll = async (req, res) => {
     const needAll = !category || category === "all";
 
     const subject = (needAll || category === "subject")
-      ? await subjectModel.find(subjectFilter).sort({ createdAt: -1 }).limit(10)
-      : [];
+      ? await subjectModel.find(subjectFilter).sort({ createdAt: -1 }).limit(10).lean() : [];
 
     const chapter = (needAll || category === "chapter")
-      ? await chapterModel.find(chapterFilter).populate("subjectId", "title").sort({ createdAt: -1 }).limit(10)
+      ? await chapterModel.find(chapterFilter).populate("subjectId", "title").sort({ createdAt: -1 }).limit(10).lean() 
       : [];
 
     const material = (needAll || category === "material" || category === "files")
@@ -62,6 +62,7 @@ const searchAll = async (req, res) => {
           .populate("chapterId", "title")
           .sort({ createdAt: -1 })
           .limit(10)
+          .lean() 
       : [];
 
     res.status(200).json({

@@ -39,7 +39,7 @@ const updateProfile = async (req, res) => {
 // 2. Delete User Controller
 const deleteUser = async (req, res) => {
   try {
-    const deletedUser = await userModel.findByIdAndDelete(req.params.id);
+    const deletedUser = await userModel.findByIdAndDelete(req.params.id).lean()
     res.status(200).json({
       message: "User deleted successfully",
       user: deletedUser,
@@ -60,8 +60,9 @@ const updateName = async (req, res) => {
     // Check karein ke is naam ka koi aur user to nahi
     const nameExist = await userModel.findOne({
       name,
-      _id: { $ne: req.user.id },
-    });
+      _id: { $ne: req.user.id },})
+      .select("_id")
+      .lean();
     if (nameExist) {
       return res.status(400).json({ message: "User already exists with this name" });
     }
@@ -69,7 +70,8 @@ const updateName = async (req, res) => {
     // For Name Update
     const updatedUser = await userModel
       .findByIdAndUpdate(req.user.id, { name }, { returnDocument: "after" })
-      .select("-password");
+      .select("-password")
+      .lean();
 
     res.status(200).json({
       message: "Name updated successfully",

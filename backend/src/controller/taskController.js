@@ -25,7 +25,8 @@ const createtask = async (req, res) => {
 //get task
 const getTask = async (req, res) => {
   try {
-    const task = await taskModal.find({ studentId: req.user.id }).sort({ createdAt: -1 })
+    const task = await taskModal.find({ studentId: req.user.id })
+    .sort({ createdAt: -1 }).lean()
     res.status(200).json({ message: "Get all task", task })
   } catch (err) {
     res.status(500).json({ message: "internal server error", err })

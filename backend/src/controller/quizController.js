@@ -237,7 +237,8 @@ const getStudentQuizzes = async (req, res) => {
       .populate("chapterId", "title")
       .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     return res.status(200).json({
       success: true,

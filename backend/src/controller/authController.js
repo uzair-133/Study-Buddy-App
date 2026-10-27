@@ -14,7 +14,7 @@ const SignUp = async (req, res) => {
                 { name },
                 { email }
             ]
-        })
+        }).lean();
         if (UserExist) {
             return res.status(400).json({ message: "User Already Exist. So go to Login Page" })
         }
@@ -73,7 +73,7 @@ const verifyEmail = async (req, res) => {
 const forgetPassword = async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email })
         if (!user) {
             return res.status(403).json({
                 message: "invalid Email"
@@ -131,7 +131,7 @@ const LogIn = async (req, res) => {
                 { name },
                 { email }
             ]
-        })
+        }).lean()
         if (!user) {
             return res.status(404).json({
                 message: "USer Not Found"
@@ -201,7 +201,7 @@ const logOut = async (req, res) => {
 //get user Data
 const getMe = async (req, res) => {
     try {
-        const user = await userModel.findById(req.user.id).select('-password')
+        const user = await userModel.findById(req.user.id).select('-password').lean()
         if (!user) {
             return res.status(404).json({
                 message: "User not found"
