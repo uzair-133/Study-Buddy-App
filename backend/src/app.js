@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 app.set('trust proxy', 1);
 
+const helmet = require('helmet')
+const compression = require('compression')
 const authRoutes = require("./routes/authRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const studentRoutes = require("./routes/studentRoutes");
@@ -54,6 +56,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(helmet({
+  // because our frontend and backend are in different port
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+app.use(compression())
 
 app.use("/api/auth", authRoutes);
 
