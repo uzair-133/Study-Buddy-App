@@ -1,10 +1,23 @@
+const fs = require("fs");
 const materialModal = require("../models/materialModal");
-const { uploadFile } = require("../services/storage.service");
+const { uploadFileStream } = require("../services/storage.service");
+
+// Helper to safely clean up temp file if validation or process fails
+const cleanupTempFile = async (filePath) => {
+  if (filePath) {
+    try {
+      await fs.promises.unlink(filePath);
+    } catch (_) {
+      // file might already be deleted
+    }
+  }
+};
 
 // 1. Upload Study Material Controller
 const uploadMaterial = async (req, res) => {
+  const file = req.file;
+
   try {
-    const file = req.file;
     if (!file) {
       return res.status(400).json({ message: "File is required" });
     }
@@ -13,15 +26,15 @@ const uploadMaterial = async (req, res) => {
     const fileName = req.body.fileName || file.originalname;
 
     if (!category || !chapterId || !subjectId) {
+      await cleanupTempFile(file.path);
       return res.status(400).json({ message: "category, chapterId, and subjectId are required" });
     }
 
-    // File ko ImageKit par upload karnay kay liye
-    const result = await uploadFile(file.buffer.toString("base64"), fileName, "/studyBuddy/files");
+    // File ko ImageKit par stream karnay kay liye (Zero RAM heap footprint)
+    const result = await uploadFileStream(file.path, fileName, "/studyBuddy/files");
 
     const userId = req.user.id || req.user._id;
     const isTeacher = req.user.role === "teacher";
-
 
     const material = await materialModal.create({
       fileName,
@@ -38,6 +51,9 @@ const uploadMaterial = async (req, res) => {
       material,
     });
   } catch (err) {
+    if (file?.path) {
+      await cleanupTempFile(file.path);
+    }
     console.error("Upload Material Error:", err);
     res.status(500).json({ message: "Internal server error", error: err.message });
   }

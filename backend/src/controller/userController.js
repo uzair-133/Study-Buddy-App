@@ -9,9 +9,9 @@ const updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Please select an image file" });
     }
 
-    // File ko ImageKit par upload karein
+    // File ko ImageKit par upload karein (direct buffer pass kar ke memory bachat)
     const result = await uploadFile(
-      file.buffer.toString("base64"),
+      file.buffer,
       file.originalname || "avatar.jpg",
       "/studyBuddy/avatars"
     );
