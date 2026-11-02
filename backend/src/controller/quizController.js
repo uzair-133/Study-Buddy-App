@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const quizModel = require("../models/quizModel");
 const subjectModel = require("../models/subjectModel");
 const chapterModel = require("../models/chapterModal");
@@ -203,7 +204,8 @@ const getStudentQuizzes = async (req, res) => {
       });
     }
 
-    const filter = { $or: [{ userId }, { studentId: userId }] };
+    const userObjId = new mongoose.Types.ObjectId(userId);
+    const filter = { $or: [{ userId: userObjId }, { studentId: userObjId }] };
     const limit = Number(limitQuery ?? 10);
     const page = Number(pageQuery ?? 1);
     const skip = (page - 1) * limit;
@@ -231,14 +233,71 @@ const getStudentQuizzes = async (req, res) => {
       });
     }
 
-    const quizzes = await quizModel
-      .find(filter)
-      .populate("subjectId", "title")
-      .populate("chapterId", "title")
-      .sort({ createdAt: -1, _id: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    // Aggregation Pipeline ($match -> $sort -> $skip -> $limit -> $lookup -> $unwind -> $project)
+    const quizzes = await quizModel.aggregate([
+      { $match: filter },
+      { $sort: { createdAt: -1, _id: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "subjects",
+          localField: "subjectId",
+          foreignField: "_id",
+          as: "subjectDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$subjectDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "chapters",
+          localField: "chapterId",
+          foreignField: "_id",
+          as: "chapterDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$chapterDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          userId: 1,
+          subjectName: 1,
+          chapterName: 1,
+          difficulty: 1,
+          mode: 1,
+          questionCount: 1,
+          questions: 1,
+          score: 1,
+          totalQuestions: 1,
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          subjectId: {
+            $cond: [
+              { $ifNull: ["$subjectDetails._id", false] },
+              { _id: "$subjectDetails._id", title: "$subjectDetails.title" },
+              "$subjectId",
+            ],
+          },
+          chapterId: {
+            $cond: [
+              { $ifNull: ["$chapterDetails._id", false] },
+              { _id: "$chapterDetails._id", title: "$chapterDetails.title" },
+              "$chapterId",
+            ],
+          },
+        },
+      },
+    ]);
 
     return res.status(200).json({
       success: true,
@@ -355,6 +414,81 @@ const askAssistant = async (req, res) => {
   }
 };
 
+/**
+ * Get Quiz Performance Stats (Aggregation Pipeline: $match -> $group -> $project)
+ */
+const getQuizStats = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+    const userObjId = new mongoose.Types.ObjectId(userId);
+
+    const stats = await quizModel.aggregate([
+      {
+        $match: {
+          $or: [{ userId: userObjId }, { studentId: userObjId }],
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalQuizzes: { $sum: 1 },
+          completedQuizzes: {
+            $sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] },
+          },
+          mcqCount: {
+            $sum: { $cond: [{ $eq: ["$mode", "mcq"] }, 1, 0] },
+          },
+          questionCount: {
+            $sum: { $cond: [{ $eq: ["$mode", "question"] }, 1, 0] },
+          },
+          averageScore: {
+            $avg: {
+              $cond: [{ $eq: ["$status", "completed"] }, "$score", null],
+            },
+          },
+          highestScore: {
+            $max: {
+              $cond: [{ $eq: ["$status", "completed"] }, "$score", null],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalQuizzes: 1,
+          completedQuizzes: 1,
+          mcqCount: 1,
+          questionCount: 1,
+          averageScore: { $round: [{ $ifNull: ["$averageScore", 0] }, 1] },
+          highestScore: { $ifNull: ["$highestScore", 0] },
+        },
+      },
+    ]);
+
+    const result = stats[0] || {
+      totalQuizzes: 0,
+      completedQuizzes: 0,
+      mcqCount: 0,
+      questionCount: 0,
+      averageScore: 0,
+      highestScore: 0,
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Quiz stats fetched successfully",
+      stats: result,
+    });
+  } catch (error) {
+    console.error("Error in getQuizStats:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch quiz stats",
+    });
+  }
+};
+
 module.exports = {
   generateQuiz,
   submitQuizResult,
@@ -362,4 +496,5 @@ module.exports = {
   getQuizById,
   deleteQuiz,
   askAssistant,
+  getQuizStats,
 };

@@ -27,7 +27,8 @@ const {
   getStudentQuizzes,
   getQuizById,
   deleteQuiz,
-  askAssistant
+  askAssistant,
+  getQuizStats,
 } = require("../controller/quizController");
 const { authStudent } = require("../middleware/authMiddleware");
 
@@ -46,6 +47,10 @@ router.post("/submit/:id", authStudent, submitQuizResult);
 // Get student quiz history
 // /api/quiz/history
 router.get("/history", authStudent, getStudentQuizzes);
+
+// Get quiz performance stats (defined before /:id)
+// /api/quiz/stats
+router.get("/stats", authStudent, getQuizStats);
 
 // Get single quiz by ID
 // /api/quiz/:id

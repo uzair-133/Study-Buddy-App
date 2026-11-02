@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const taskModal = require('../models/taskModal')
 
 
@@ -25,14 +26,54 @@ const createtask = async (req, res) => {
 //get task
 const getTask = async (req, res) => {
   try {
-    const task = await taskModal.find({ studentId: req.user.id })
-    .sort({ createdAt: -1 }).lean()
+    const task = await taskModal.find({ studentId: req.user.id }).sort({ createdAt: -1 }).lean();
     res.status(200).json({ message: "Get all task", task })
   } catch (err) {
     res.status(500).json({ message: "internal server error", err })
   }
 }
 
+const getTaskStats = async(req,res)=> {
+  try{
+     const taskStats = await taskModal.aggregate([
+      {
+       $match:{
+         studentId: new mongoose.Types.ObjectId(req.user.id)
+       }
+    },
+    {
+      $group:{
+        _id:null,
+        completedTask:{$sum:{$cond:["$isCompleted",1,0]}},
+        upComingTask:{$sum:{$cond:["$isCompleted",0,1]}}
+      }
+    },
+    {
+      $project:{
+        _id:0,
+        completedTask:1,
+        upComingTask:1,
+        totalTasks:{
+          $add: ["$completedTask", "$upComingTask"]
+        }
+
+      }
+    }
+
+  ])
+  const stats = taskStats[0] || { completedTask: 0, upComingTask: 0, totalTasks: 0 };
+  res.status(200).json({
+    message:"Get Task Stats",
+     taskStats: stats,
+  })
+  }
+  catch(err){
+    res.status(500).json({
+      message:"Internal Server Error",
+      err
+    })
+  }
+}
 
 //update task
 const updateTask = async (req, res) => {
@@ -72,4 +113,4 @@ const deleteTask = async (req, res) => {
   }
 }
 
-module.exports = { createtask, getTask, updateTask, deleteTask }
+module.exports = { createtask, getTask,getTaskStats, updateTask, deleteTask }
