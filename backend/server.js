@@ -1,5 +1,6 @@
 require('dotenv').config()
 const app = require('./src/app')
+require('./src/db/redis')
 // const cluster = require('node:cluster')
 // const os = require('node:os')
 const ConnectToDb = require('./src/db/db')

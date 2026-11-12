@@ -1,6 +1,6 @@
 const subjectModal = require("../models/subjectModel");
 const classMemberShipModel = require("../models/classMembershipModel");
-
+const redis = require('../db/redis')
 // 1. Create Subject Controller
 const createSubject = async (req, res) => {
   try {
@@ -19,6 +19,12 @@ const createSubject = async (req, res) => {
       classId: isTeacher && classId ? classId : null,
     });
 
+    await redis.del(`subject:dashboard:${userId}`)
+
+    const keys = await redis.keys(`subjects:${userId}:*`);
+    if (keys.length > 0) {
+      await redis.del(keys);
+    }
     res.status(201).json({ message: "Subject Created Successfully", subject });
   } catch (err) {
     res.status(500).json({ message: "Internal server error", error: err.message });
@@ -73,13 +79,25 @@ const getSubject = async (req, res) => {
     const userId = req.user.id || req.user._id;
     const isTeacher = req.user.role === "teacher";
     const { classId, dashboard } = req.query;
-    const {page:pageQuery,limit:limitQuery } = req.query;
+    const { page: pageQuery, limit: limitQuery } = req.query;
+
+
 
     // Case A: Dashboard (Sirf 4 latest cards)
     if (dashboard === "true") {
+      const cacheKey = `subject:dashboard:${userId}`;
+      const cached = await redis.get(cacheKey);
+      if (cached) {
+        return res.status(200).json(JSON.parse(cached))
+      }
       const subject = await getDashboardSubjects(userId, isTeacher);
-      return res.status(200).json({ message: "Dashboard Subjects", subject });
+      const responseData = { message: "Dashboard Subjects", subject };
+      await redis.set(cacheKey, JSON.stringify(responseData),
+        "EX", 300)
+      return res.status(200).json(responseData)
     }
+
+
 
     // Case B vs Case C: Determine filter and response message
     let filter;
@@ -129,6 +147,11 @@ const getSubject = async (req, res) => {
     const page = Number(pageQuery ?? 1);
     const skip = (page - 1) * limit;
 
+    const cachedKey = `subject:${userId}:${classId || "Personel"}:${page}:${limit}`
+    const cached = await redis.get(cachedKey)
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached))
+    }
     const totalSubject = await subjectModal.countDocuments(filter);
     const totalPages = Math.ceil(totalSubject / limit);
 
@@ -152,14 +175,15 @@ const getSubject = async (req, res) => {
       });
     }
 
+
     const subject = await subjectModal
       .find(filter)
-      .sort({ createdAt: -1,_id:-1 })
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       message: messageType,
       subject,
@@ -167,7 +191,11 @@ const getSubject = async (req, res) => {
       limit,
       totalSubject,
       totalPages,
-    });
+    };
+    await redis.set(cachedKey, JSON.stringify(responseData),
+      "EX", 300)
+    return res.status(200).json(responseData)
+
   } catch (err) {
     res.status(500).json({ message: "Internal server error", error: err.message });
   }
@@ -182,8 +210,16 @@ const deleteSubject = async (req, res) => {
       $or: [{ studentId: userId }, { teacherId: userId }],
     });
 
+
     if (!subject) {
       return res.status(404).json({ message: "Subject not found" });
+    }
+
+    await redis.del(`subject:dashboard:${userId}`)
+
+    const keys = await redis.keys(`subject:${userId}:*`)
+    if (keys.length > 0) {
+      await redis.del(keys);
     }
 
     res.status(200).json({ message: "Subject deleted successfully" });

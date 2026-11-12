@@ -1,6 +1,6 @@
 const chapterModel = require('../models/chapterModal');
 
-
+const redis = require('../db/redis')
 
 
 //create chapter
@@ -32,6 +32,12 @@ const createChapter = async (req, res) => {
             teacherId: isTeacher ? userId : null,
         });
 
+        const keys = await redis.keys(`chapter page:${subjectId}:*`);
+        if (keys.length > 0) {
+            await redis.del(keys);
+        }
+
+
         res.status(201).json({
             message: "Chapter Created Successfully",
             chapter
@@ -51,8 +57,8 @@ const getChapter = async (req, res) => {
     try {
         const subjectId = req.params.subjectId || req.query.subjectId || req.body.subjectId;
         const userId = req.user.id || req.user._id;
-        const {page:pageQuery,limit:limitQuery} = req.query;
-    
+        const { page: pageQuery, limit: limitQuery } = req.query;
+
 
 
         const filter = {};
@@ -62,56 +68,61 @@ const getChapter = async (req, res) => {
             filter.$or = [{ studentId: userId }, { teacherId: userId }];
         }
 
-          // Pagination Validation
-    if (
-      pageQuery !== undefined &&
-      (!/^[1-9]\d*$/.test(pageQuery) ||
-        !Number.isSafeInteger(Number(pageQuery)))
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Page must be a positive integer",
-      });
-    }
+        // Pagination Validation
+        if (
+            pageQuery !== undefined &&
+            (!/^[1-9]\d*$/.test(pageQuery) ||
+                !Number.isSafeInteger(Number(pageQuery)))
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Page must be a positive integer",
+            });
+        }
 
-    if (
-      limitQuery !== undefined &&
-      (!/^[1-9]\d*$/.test(limitQuery) ||
-        !Number.isSafeInteger(Number(limitQuery)) ||
-        Number(limitQuery) > 50)
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Limit must be between 1 and 50",
-      });
-    }
+        if (
+            limitQuery !== undefined &&
+            (!/^[1-9]\d*$/.test(limitQuery) ||
+                !Number.isSafeInteger(Number(limitQuery)) ||
+                Number(limitQuery) > 50)
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Limit must be between 1 and 50",
+            });
+        }
 
-    const page = Number(pageQuery ?? 1);
-    const limit = Number(limitQuery ?? 10);
-    const skip = (page - 1) * limit;
-     const totalChapter = await chapterModel.countDocuments(filter);
-   const totalPages = Math.ceil(totalChapter/limit)
+        const page = Number(pageQuery ?? 1);
+        const limit = Number(limitQuery ?? 10);
+        const skip = (page - 1) * limit;
+        const cacheKey = `chapter page:${subjectId}:${page}:${limit}`;
+        const cached = await redis.get(cacheKey)
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached))
+        }
+        const totalChapter = await chapterModel.countDocuments(filter);
+        const totalPages = Math.ceil(totalChapter / limit)
 
-       if (totalChapter === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "No Chapter found",
-        chapter: [],
-        currentPage: page,
-        limit,
-        totalChapter: 0,
-        totalPages: 0,
-      });
-    }
-     if (page > totalPages) {
-      return res.status(400).json({
-        success: false,
-        message: "Requested page is not available",
-        totalPages,
-      });
-    }
-        const chapter = await chapterModel.find(filter).sort({ createdAt: -1,_id:-1 }).skip(skip).limit(limit).lean();
-        res.status(200).json({
+        if (totalChapter === 0) {
+            return res.status(200).json({
+                success: true,
+                message: "No Chapter found",
+                chapter: [],
+                currentPage: page,
+                limit,
+                totalChapter: 0,
+                totalPages: 0,
+            });
+        }
+        if (page > totalPages) {
+            return res.status(400).json({
+                success: false,
+                message: "Requested page is not available",
+                totalPages,
+            });
+        }
+        const chapter = await chapterModel.find(filter).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean();
+        const responseData = {
             success: true,
             message: "Get All Chapter",
             chapter,
@@ -119,8 +130,11 @@ const getChapter = async (req, res) => {
             limit,
             totalChapter,
             totalPages,
-        });
-       
+        };
+        await redis.set(cacheKey, JSON.stringify(responseData),
+            "EX", 300)
+        return res.status(200).json(responseData)
+
     }
     catch (err) {
         console.error("Error in getChapter:", err);
@@ -144,7 +158,14 @@ const deleteChapter = async (req, res) => {
         if (!chapter) {
             return res.status(404).json({ message: "Chapter not found" });
         }
+        const subjectId = chapter.subjectId;
         await chapter.deleteOne();
+
+        const keys = await redis.keys(`chapter page:${subjectId}:*`);
+        if (keys.length > 0) {
+            await redis.del(keys);
+        }
+
         res.status(200).json({ message: "Chapter deleted successfully" });
     }
     catch (err) {
