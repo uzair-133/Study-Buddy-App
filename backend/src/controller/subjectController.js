@@ -21,7 +21,7 @@ const createSubject = async (req, res) => {
 
     await redis.del(`subject:dashboard:${userId}`)
 
-    const keys = await redis.keys(`subjects:${userId}:*`);
+    const keys = await redis.keys(`subject:${userId}:*`);
     if (keys.length > 0) {
       await redis.del(keys);
     }

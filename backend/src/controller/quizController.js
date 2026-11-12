@@ -4,7 +4,19 @@ const subjectModel = require("../models/subjectModel");
 const chapterModel = require("../models/chapterModal");
 const materialModel = require("../models/materialModal");
 const geminiService = require("../services/gemini.service");
+const redis = require('../db/redis');
 
+// Clear all cached quiz pages for a specific user
+const clearQuizCache = async (userId) => {
+  try {
+    const keys = await redis.keys(`quiz:${userId}:*`);
+    if (keys.length > 0) {
+      await redis.del(keys);
+    }
+  } catch (err) {
+    console.error("Redis clearQuizCache warning:", err.message);
+  }
+};
 /**
  * Generate Quiz Controller
  * Ek hi endpoint logic jo mode ('mcq' | 'question') aur difficulty ('easy' | 'medium' | 'difficult') handle karta hai.
@@ -95,6 +107,9 @@ const generateQuiz = async (req, res) => {
       status: "generated",
     });
 
+    //  Invalidate quiz history cache for this user
+    await clearQuizCache(userId);
+
     res.status(201).json({
       success: true,
       message: "Quiz generated successfully",
@@ -157,6 +172,9 @@ const submitQuizResult = async (req, res) => {
     quiz.status = "completed";
     await quiz.save();
 
+
+    await clearQuizCache(userId);
+
     return res.status(200).json({
       success: true,
       message: "Quiz score submitted successfully",
@@ -210,6 +228,11 @@ const getStudentQuizzes = async (req, res) => {
     const page = Number(pageQuery ?? 1);
     const skip = (page - 1) * limit;
 
+    const cachekey = `quiz:${userId}:${page}:${limit}`;
+    const cached = await redis.get(cachekey)
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached))
+    }
     const totalQuiz = await quizModel.countDocuments(filter);
     const totalPages = Math.ceil(totalQuiz / limit);
 
@@ -299,7 +322,7 @@ const getStudentQuizzes = async (req, res) => {
       },
     ]);
 
-    return res.status(200).json({
+    const responseData = {
       success: true,
       count: quizzes.length,
       quizzes,
@@ -307,7 +330,9 @@ const getStudentQuizzes = async (req, res) => {
       limit,
       totalQuiz,
       totalPages,
-    });
+    };
+    await redis.set(cachekey, JSON.stringify(responseData), "EX", 300);
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error("Error in getStudentQuizzes controller:", error);
     return res.status(500).json({
@@ -371,6 +396,8 @@ const deleteQuiz = async (req, res) => {
         message: "Quiz not found or unauthorized",
       });
     }
+
+    await clearQuizCache(userId);
 
     return res.status(200).json({
       success: true,

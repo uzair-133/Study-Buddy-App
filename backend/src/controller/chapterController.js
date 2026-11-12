@@ -32,7 +32,7 @@ const createChapter = async (req, res) => {
             teacherId: isTeacher ? userId : null,
         });
 
-        const keys = await redis.keys(`chapter page:${subjectId}:*`);
+        const keys = await redis.keys(`chapter:${subjectId}:*`);
         if (keys.length > 0) {
             await redis.del(keys);
         }
@@ -95,7 +95,7 @@ const getChapter = async (req, res) => {
         const page = Number(pageQuery ?? 1);
         const limit = Number(limitQuery ?? 10);
         const skip = (page - 1) * limit;
-        const cacheKey = `chapter page:${subjectId}:${page}:${limit}`;
+        const cacheKey = `chapter:${subjectId}:${page}:${limit}`;
         const cached = await redis.get(cacheKey)
         if (cached) {
             return res.status(200).json(JSON.parse(cached))
@@ -161,7 +161,7 @@ const deleteChapter = async (req, res) => {
         const subjectId = chapter.subjectId;
         await chapter.deleteOne();
 
-        const keys = await redis.keys(`chapter page:${subjectId}:*`);
+        const keys = await redis.keys(`chapter:${subjectId}:*`);
         if (keys.length > 0) {
             await redis.del(keys);
         }

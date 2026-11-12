@@ -1,6 +1,7 @@
 const fs = require("fs");
 const materialModal = require("../models/materialModal");
 const { uploadFileStream } = require("../services/storage.service");
+const redis = require("../db/redis");
 
 // Helper to safely clean up temp file if validation or process fails
 const cleanupTempFile = async (filePath) => {
@@ -45,6 +46,18 @@ const uploadMaterial = async (req, res) => {
       chapterId,
       subjectId,
     });
+
+
+    const keys = await redis.keys(`material:${subjectId}:${chapterId}:*`);
+    if (keys.length > 0) {
+      await redis.del(keys);
+    }
+
+    // Invalidate user's general materials cache
+    const userKeys = await redis.keys(`material:${userId}:*`);
+    if (userKeys.length > 0) {
+      await redis.del(userKeys);
+    }
 
     res.status(201).json({
       message: "Material Uploaded Successfully",
@@ -103,6 +116,13 @@ const getMaterial = async (req, res) => {
     const page = Number(pageQuery ?? 1);
     const skip = (page - 1) * limit;
 
+
+    const cachekey = `material:${subjectId || userId}:${chapterId || "all"}:${category || "all"}:${page}:${limit}`;
+    const cached = await redis.get(cachekey);
+    if (cached) {
+      return res.status(200).json(JSON.parse(cached));
+    }
+
     const totalMaterial = await materialModal.countDocuments(filter);
     const totalPages = Math.ceil(totalMaterial / limit);
 
@@ -133,7 +153,7 @@ const getMaterial = async (req, res) => {
       .limit(limit)
       .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       message: "Materials fetched successfully",
       materials,
@@ -141,7 +161,10 @@ const getMaterial = async (req, res) => {
       limit,
       totalMaterial,
       totalPages,
-    });
+    };
+
+    await redis.set(cachekey, JSON.stringify(responseData), "EX", 300);
+    return res.status(200).json(responseData);
   } catch (err) {
     res.status(500).json({ message: "Internal server error", error: err.message });
   }
@@ -158,6 +181,20 @@ const deleteMaterial = async (req, res) => {
 
     if (!material) {
       return res.status(404).json({ message: "Material not found or unauthorized" });
+    }
+
+
+    if (material.subjectId && material.chapterId) {
+      const keys = await redis.keys(`material:${material.subjectId}:${material.chapterId}:*`);
+      if (keys.length > 0) {
+        await redis.del(keys);
+      }
+    }
+
+    // ⚡ Invalidate user's general materials cache
+    const userKeys = await redis.keys(`material:${userId}:*`);
+    if (userKeys.length > 0) {
+      await redis.del(userKeys);
     }
 
     res.status(200).json({
